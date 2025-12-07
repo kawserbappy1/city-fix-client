@@ -25,3 +25,6 @@
 html {
   @apply font-poppins bg-bg2;
 }
+.active {
+  @apply text-blue font-bold;
+}
