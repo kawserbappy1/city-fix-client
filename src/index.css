@@ -87,8 +87,8 @@ html {
 .banner-swiper .swiper-button-next,
 .banner-swiper .swiper-button-prev {
   color: hsl(var(--a)) !important;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   backdrop-filter: blur(8px);
   border: 1px solid #02ae9d;
@@ -112,7 +112,7 @@ html {
 .banner-swiper .swiper-button-prev,
 .banner-swiper .swiper-button-next {
   svg {
-    height: 50%;
+    height: 30%;
     color: #fff;
   }
 }

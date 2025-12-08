@@ -33,7 +33,7 @@ const Navbar = () => {
         </span>
         {/* menu area  */}
         <div className="hidden md:block">
-          <ul className="flex items-center gap-4 text-xs tracking-wider text-white">
+          <ul className="flex items-center gap-4 text-sm tracking-wider text-white">
             {links}
           </ul>
         </div>
