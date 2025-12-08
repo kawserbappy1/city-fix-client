@@ -4,7 +4,7 @@ import { MdOutlineEditLocationAlt } from "react-icons/md";
 import { BiUpvote } from "react-icons/bi";
 const IssueCard = () => {
   return (
-    <div className="card bg-bg4 shadow-md transition-all duration-300">
+    <div className="card bg-bg4 shadow-md transition-all duration-300 ">
       {/* Image */}
       <figure className="h-48 overflow-hidden">
         <img
