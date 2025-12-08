@@ -305,7 +305,7 @@ const HowItWorks = () => {
     <div className="bg-bg4">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 lg:py-24 ">
         {/* Section Title */}
-        <div className="text-center mb-12 lg:mb-20">
+        <div className="text-center mb-10 lg:mb-10">
           <div className="inline-flex items-center justify-center mb-4">
             <FaLightbulb className="w-10 h-10 text-warning mr-3" />
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text uppercase tracking-tight font-nunito">
@@ -320,7 +320,7 @@ const HowItWorks = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative">
           {/* Left Column - Steps 1 & 4 */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-16 lg:space-y-32 lg:py-8">
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-10 lg:space-y-10 lg:py-1">
             {leftSteps.map((step, index) => (
               <TextBlock
                 key={index}
@@ -336,12 +336,12 @@ const HowItWorks = () => {
           </div>
 
           {/* Center Column - Diagram */}
-          <div className="w-[80%] mx-auto lg:col-span-4 flex items-center justify-center my-8 lg:my-0">
+          <div className="w-[80%]  mx-auto lg:col-span-4 flex items-center justify-center my-8 lg:my-0">
             <CentralDiagram />
           </div>
 
           {/* Right Column - Steps 2 & 3 */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-16 lg:space-y-32 lg:py-8">
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-16 lg:space-y-32 lg:py-1">
             {rightSteps.map((step, index) => (
               <TextBlock
                 key={index}

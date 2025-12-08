@@ -1,13 +1,36 @@
 import { FaCheck } from "react-icons/fa";
-
+import phone from "../../../assets/phone.svg";
+import { MdOutlineMarkEmailRead } from "react-icons/md";
+import { FaMobileScreen } from "react-icons/fa6";
 const Pricing = () => {
   return (
     <section className="pb-15 bg-white">
-      <div className="container mx-auto px-4">
+      <div className="container flex flex-col gap-6 lg:flex-row mx-auto px-4 items-center">
         {/* Pricing Cards */}
+        <div className="flex-1 bg-accent p-10  shadow-md rounded-md">
+          <img
+            src={phone}
+            alt=""
+            className="w-15 h-15 bg-bg1 border border-bg7"
+          />
+          <h2 className="text-2xl py-5 text-white font-bold">Contact</h2>
+          <p className="mb-2">
+            if you face any kind of issue to choose our pricing plane just
+            contact with us with feel free
+          </p>
+
+          <div className="flex items-center gap-2 border-b border-b-bg1/50 pb-1">
+            <MdOutlineMarkEmailRead className="text-bg1 text-xl" />
+            <span className="text-white">info.cityfix@mail.com</span>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <FaMobileScreen className="text-bg1 text-xl" />
+            <span className="text-white">+000-123456789</span>
+          </div>
+        </div>
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free Plan */}
-          <div className="bg-text shadow-md rounded-lg  p-6 hover:shadow-xl transition-all">
+          <div className="bg-text shadow-md rounded-lg  p-6 hover:shadow-xl transition-all ">
             <h3 className="text-xl text-center font-semibold text-bg6 mb-2">
               Starter
             </h3>
@@ -21,6 +44,12 @@ const Pricing = () => {
             <ul className="space-y-2 text-bg6 text-sm">
               <li className="flex gap-2 items-center ">
                 <FaCheck className="text-accent" /> Report up to 50 issues
+              </li>
+              <li className="flex gap-2 items-center ">
+                <FaCheck className="text-accent" /> Priority normal
+              </li>
+              <li className="flex gap-2 items-center ">
+                <FaCheck className="text-accent" /> Response 3/4 days
               </li>
               <li className="flex gap-2 items-center">
                 <FaCheck className="text-accent" /> Basic dashboard
@@ -94,6 +123,9 @@ const Pricing = () => {
               </li>
               <li className="flex gap-2 items-center">
                 <FaCheck className="text-accent" /> Dedicated account manager
+              </li>
+              <li className="flex gap-2 items-center">
+                <FaCheck className="text-accent" /> Instant support
               </li>
             </ul>
 

@@ -1,8 +1,11 @@
 import Header from "../../../components/Header";
 import Slider from "../../../components/Slider";
+import Brand from "../Brand/Brand";
+import ContactSection from "../ContactSection/ContactSection";
 import HowItWorks from "../HowItWorks/HowItWorks";
 import IssueCard from "../IssueCard/IssueCard";
 import Pricing from "../Pricing/Pricing";
+import Testimonial from "../Testimonial/Testimonial";
 import WhyChoose from "../WhyCooose/WhyCooose";
 
 const Home = () => {
@@ -28,6 +31,9 @@ const Home = () => {
         ></Header>
         <Pricing></Pricing>
         <HowItWorks></HowItWorks>
+        <Testimonial></Testimonial>
+        <Brand></Brand>
+        <ContactSection></ContactSection>
       </div>
     </div>
   );
