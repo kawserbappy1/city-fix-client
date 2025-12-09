@@ -1,24 +1,23 @@
-import { FaFacebook, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import bannerImage1 from "../assets/slide-bg1.jpg";
 import bannerImage2 from "../assets/slide-bg2.jpg";
 import bannerImage3 from "../assets/slide-bg3.jpg";
 import bannerImage4 from "../assets/slide-bg4.png";
-import { AiFillInstagram } from "react-icons/ai";
-import { Link } from "react-router";
 import ButtonLg from "../assets/ButtonLg";
 import { MdArrowOutward } from "react-icons/md";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { IoIosArrowRoundForward } from "react-icons/io";
+
 const Slider = () => {
   const sliderInfo = [
     {
       title: "Citizen Reporting Made Easy",
       subTitle: "Report Public Issues Instantly",
-      desc: "Whether it's a broken streetlight, pothole, or garbage overflow, report it in just a few clicks. ",
+      desc: "Whether it's a broken streetlight, pothole, or garbage overflow, report it in just a few clicks.",
       slideImage: bannerImage1,
     },
     {
@@ -30,7 +29,7 @@ const Slider = () => {
     {
       title: "Transparent Citizen Feedback",
       subTitle: "Stay Informed Every Step of the Way",
-      desc: "Citizens can follow the progress of their reported issues and see when they’re resolved.",
+      desc: "Citizens can follow the progress of their reported issues and see when they're resolved.",
       slideImage: bannerImage3,
     },
     {
@@ -40,16 +39,27 @@ const Slider = () => {
       slideImage: bannerImage4,
     },
   ];
+
   return (
-    <div className="banner-swiper">
+    <div className="banner-swiper relative">
       <Swiper
         spaceBetween={30}
+        autoplay={{
+          delay: 2500,
+          disableOnInteraction: false,
+        }}
         effect={"fade"}
-        navigation={true}
+        navigation={{
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        }}
         pagination={{
           clickable: true,
+          el: ".swiper-pagination",
+          bulletClass: "swiper-pagination-bullet",
+          bulletActiveClass: "swiper-pagination-bullet-active",
         }}
-        modules={[EffectFade, Navigation, Pagination]}
+        modules={[EffectFade, Navigation, Pagination, Autoplay]}
         className="mySwiper"
       >
         {sliderInfo.map((slider, indx) => (
@@ -61,47 +71,43 @@ const Slider = () => {
                   backgroundImage: `url(${slider.slideImage})`,
                 }}
               >
-                <div className="absolute inset-0 bg-black/70"></div>
+                <div className={`absolute inset-0 bg-black/70`}></div>
               </div>
 
-              <div className="relative container z-10 text-center">
-                <h4 className="text-white font-nunito text-base mb-5">
+              <div className="relative container z-10 text-center px-4">
+                <h4 className="text-white font-nunito text-lg mb-5">
                   {slider.subTitle}
-                  <span className="font-bold "> - City Fix</span>
+                  <span className="font-bold text-accent"> - City Fix</span>
                 </h4>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-accent font-nunito mb-4 sm:mb-6 capitalize">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white font-nunito mb-4 sm:mb-6 capitalize">
                   {slider.title}
                 </h1>
 
-                <p className="text-md md:text-base text-gray-200 mb-6 sm:mb-8 to max-w-xl mx-auto">
+                <p className="text-md md:text-lg text-gray-200 mb-8 sm:mb-10 max-w-2xl mx-auto">
                   {slider.desc}
                 </p>
 
                 <button>
                   <ButtonLg to={"/"} text="Learn More">
-                    <MdArrowOutward className="text-xl transition-transform duration-300 group-hover:rotate-50" />
+                    <MdArrowOutward className="text-xl transition-transform duration-300 group-hover:rotate-45" />
                   </ButtonLg>
                 </button>
-                <div className=" absolute left-[50%] -translate-x-[50%] md:top-0 md:left-0 ">
-                  <div className="flex md:flex-col mt-5 md:mt-0 gap-2 ">
-                    <Link className="social-link" to={"/"}>
-                      <FaFacebook />
-                    </Link>
-                    <Link to={"/"} className="social-link">
-                      <FaXTwitter />
-                    </Link>
-                    <Link to={"/"} className="social-link">
-                      <FaLinkedinIn />
-                    </Link>
-                    <Link to={"/"} className="social-link">
-                      <AiFillInstagram />
-                    </Link>
-                  </div>
-                </div>
               </div>
             </div>
           </SwiperSlide>
         ))}
+
+        {/* Custom Navigation Buttons */}
+        <div className="swiper-button-prev !w-8 !h-8  rounded-full border-2 border-accent text-white hover:bg-accent hover:text-white transition-all duration-300 flex items-center justify-center">
+          <IoIosArrowRoundForward className="w-7 h-7 md:w-8 md:h-8 rotate-180 text-base-100" />
+        </div>
+
+        <div className="swiper-button-next !w-8 !h-8  rounded-full border-2 border-accent text-white hover:bg-accent hover:text-white transition-all duration-300 flex items-center justify-center">
+          <IoIosArrowRoundForward className="w-7 h-7 md:w-8 md:h-8 text-base-100" />
+        </div>
+
+        {/* Custom Pagination */}
+        <div className="swiper-pagination !bottom-8 md:!bottom-12 !left-1/2 !transform !-translate-x-1/2 !w-auto"></div>
       </Swiper>
     </div>
   );

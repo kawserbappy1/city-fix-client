@@ -1,58 +1,167 @@
-import { FaThumbsUp } from "react-icons/fa";
-import issue from "../../../assets/issue1.jpg";
-import { MdOutlineEditLocationAlt } from "react-icons/md";
+import {
+  FaMapMarkerAlt,
+  FaEye,
+  FaComment,
+  FaShareAlt,
+  FaFire,
+  FaUser,
+  FaCalendarAlt,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { BiUpvote } from "react-icons/bi";
+import { motion } from "framer-motion";
+
 const IssueCard = () => {
+  const priority = "high"; // Can be "low", "medium", "high", "critical"
+
+  const priorityColors = {
+    low: {
+      bg: "bg-base-100",
+      badge: "badge-info",
+      text: "text-info",
+      progress: "from-info to-info-focus",
+    },
+    medium: {
+      bg: "bg-base-100",
+      badge: "badge-warning",
+      text: "text-warning",
+      progress: "from-warning to-warning-focus",
+    },
+    high: {
+      bg: "bg-base-100",
+      badge: "badge-error",
+      text: "text-error",
+      progress: "from-error to-error-focus",
+    },
+    critical: {
+      bg: "bg-error/5",
+      badge: "badge-error",
+      text: "text-error",
+      progress: "from-error to-error-focus",
+      border: "border-error/20",
+    },
+  };
+
+  const currentPriority = priorityColors[priority];
+
   return (
-    <div className="card bg-bg4 shadow-md transition-all duration-300 ">
-      {/* Image */}
-      <figure className="h-48 overflow-hidden">
+    <motion.div
+      className={`card ${currentPriority.bg} border ${
+        currentPriority.border || "border-base-300"
+      } shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden rounded-xl`}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -3 }}
+      viewport={{ once: true }}
+    >
+      {/* Image Container */}
+      <figure className="relative h-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10"></div>
         <img
-          src={issue}
-          alt="Issue Preview"
-          className="w-full object-cover transition-all duration-500 hover:scale-110"
+          src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+          alt="Broken Streetlight"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
+
+        {/* Priority Badge */}
+        <div className="absolute top-3 left-3 z-20">
+          <div
+            className={`badge ${currentPriority.badge} badge-sm font-bold gap-1`}
+          >
+            <FaExclamationTriangle className="text-xs" />
+            {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
+          </div>
+        </div>
       </figure>
 
-      <div className="card-body space-y-2">
+      {/* Content */}
+      <div className="card-body p-4 space-y-3">
         {/* Title */}
-        <h2 className="card-title text-lg  text-text2 font-nunito font-bold">
+        <h2 className="card-title text-base font-bold text-base-content">
           Broken Streetlight on Main Road
         </h2>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2">
-          <span className="badge bg-bg10 rounded-full text-text1 text-sm">
-            Streetlights
-          </span>
-          <span className="badge bg-warning rounded-full">Pending</span>
-          <span className="badge badge-outline rounded-full">Normal</span>
-        </div>
-
-        {/* Location */}
-        <p className="flex gap-2 items-center text-sm text-gray-600">
-          <MdOutlineEditLocationAlt size={20} />{" "}
-          <span className="font-medium">Central Avenue, Dhaka</span>
+        {/* Description */}
+        <p className="text-base-content/70 text-xs leading-relaxed line-clamp-2">
+          Streetlight not working for past 3 days, causing safety concerns for
+          pedestrians.
         </p>
 
-        {/* Upvotes + Posted Info */}
-        <div className="flex justify-between items-center text-sm">
-          <span className="flex items-center gap-1 text-accent">
-            {/* <FaThumbsUp /> 12 */}
-            <BiUpvote /> 12
+        {/* Location */}
+        <div className="flex items-center gap-2">
+          <FaMapMarkerAlt className="text-accent text-xs" />
+          <span className="text-xs text-base-content/80">
+            Central Avenue, Dhaka
           </span>
-
-          <p className="text-xs text-gray-500 text-end">
-            Posted by: <span className="font-semibold">Reza</span> • 5 days ago
-          </p>
         </div>
 
-        {/* View button */}
-        <button className="btn btn-sm btn-accent mt-3 text-text">
-          View Details
-        </button>
+        {/* Stats */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                <BiUpvote className="text-primary text-xs" />
+              </div>
+              <span className="font-bold text-base-content">42</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center">
+                <FaComment className="text-secondary text-xs" />
+              </div>
+              <span className="font-bold text-base-content">15</span>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <p className="text-xs text-base-content/60">Posted by</p>
+            <p className="font-medium text-base-content text-xs">Reza Ahmed</p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs text-base-content">Progress</span>
+            <span className={`text-xs font-bold ${currentPriority.text}`}>
+              65%
+            </span>
+          </div>
+          <div className="w-full bg-base-300 rounded-full h-1">
+            <motion.div
+              className={`bg-gradient-to-r ${currentPriority.progress} h-1 rounded-full`}
+              initial={{ width: 0 }}
+              whileInView={{ width: "65%" }}
+              transition={{ duration: 1 }}
+            ></motion.div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-2">
+          <motion.button
+            className="btn btn-primary btn-xs flex-1 gap-1"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <BiUpvote />
+            Upvote
+          </motion.button>
+
+          <motion.button
+            className="btn btn-outline btn-accent btn-xs flex-1 gap-1"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaShareAlt />
+            Share
+          </motion.button>
+        </div>
+
+        <div className="">
+          <button className="btn btn-primary w-full">View More</button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

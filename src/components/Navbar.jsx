@@ -4,6 +4,8 @@ import Button from "./Button";
 import { CiLogin, CiMenuFries } from "react-icons/ci";
 import { AiOutlineClose } from "react-icons/ai";
 import { useState } from "react";
+import { FaEdit } from "react-icons/fa";
+import { MdOutlineEdit } from "react-icons/md";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,10 +18,10 @@ const Navbar = () => {
         <NavLink to="/dflkdj">All Issues</NavLink>
       </li>
       <li className="link-hover">
-        <NavLink to="/dflkdj">Blog</NavLink>
+        <NavLink to="/blog">Blog</NavLink>
       </li>
       <li className="link-hover">
-        <NavLink to="/dflkdj">Contact</NavLink>
+        <NavLink to="/contact">Contact</NavLink>
       </li>
     </>
   );
@@ -38,7 +40,13 @@ const Navbar = () => {
           </ul>
         </div>
         {/* button area  */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex gap-2">
+          <Button
+            text="Create Issue"
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+          >
+            <MdOutlineEdit className="text-xl transition-transform duration-300 group-hover:translate-x-1" />
+          </Button>
           <Button
             text="Login"
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
