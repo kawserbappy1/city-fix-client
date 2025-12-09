@@ -11,8 +11,8 @@ import { motion } from "framer-motion";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-30 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -22,7 +22,7 @@ const PrivacyPolicy = () => {
         >
           <div className="inline-flex items-center gap-3 mb-4 px-4 py-2 rounded-full bg-accent/10 border border-accent/20">
             <FaShieldAlt className="text-accent text-xl" />
-            <h1 className="text-3xl md:text-4xl font-bold text-base-content">
+            <h1 className="text-3xl md:text-4xl font-bold text-base-content font-nunito">
               Privacy Policy
             </h1>
           </div>

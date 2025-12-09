@@ -7,6 +7,9 @@ import RefundPolicy from "./../pages/RefundPolicy/RefundPolicy";
 import PrivacyPolicy from "./../pages/PrivacyPolicy/PrivacyPolicy";
 import TermsConditions from "./../pages/TermsConditions/TermsConditions";
 import Careers from "./../pages/Careers/Careers";
+import AuthLayout from "../layouts/AuthLayout";
+import Login from "../pages/Auth/Login/Login";
+import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +43,20 @@ const router = createBrowserRouter([
       {
         path: "careers",
         element: <Careers></Careers>,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <AuthLayout></AuthLayout>,
+    children: [
+      {
+        path: "login",
+        element: <Login></Login>,
+      },
+      {
+        path: "sign-up",
+        element: <SignUpForm></SignUpForm>,
       },
     ],
   },

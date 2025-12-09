@@ -1,10 +1,8 @@
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import Logo from "./Logo";
-import Button from "./Button";
 import { CiLogin, CiMenuFries } from "react-icons/ci";
 import { AiOutlineClose } from "react-icons/ai";
 import { useState } from "react";
-import { FaEdit } from "react-icons/fa";
 import { MdOutlineEdit } from "react-icons/md";
 
 const Navbar = () => {
@@ -27,8 +25,8 @@ const Navbar = () => {
   );
 
   return (
-    <div className="fixed top-0 left-0 w-full z-50 bg-transparent">
-      <nav className="container mx-auto flex items-center justify-between h-16 px-2 shadow ">
+    <div className="fixed top-0 left-0 w-full z-50 bg-transparent px-2">
+      <nav className="container mx-auto flex items-center justify-between h-16 px-2  shadow bg-black/70 rounded-full backdrop-blur-2xl z-50">
         {/* logo area  */}
         <span>
           <Logo></Logo>
@@ -41,26 +39,23 @@ const Navbar = () => {
         </div>
         {/* button area  */}
         <div className="hidden md:flex gap-2">
-          <Button
-            text="Create Issue"
-            className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+          <Link to={"/"} className="bg-accent px-2 py-2  text-white group ">
+            Create Issue
+          </Link>
+          <Link
+            to={"/login"}
+            className="bg-accent px-4 py-2 text-white group rounded-full "
           >
-            <MdOutlineEdit className="text-xl transition-transform duration-300 group-hover:translate-x-1" />
-          </Button>
-          <Button
-            text="Login"
-            className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
-          >
-            <CiLogin className="text-xl transition-transform duration-300 group-hover:translate-x-1" />
-          </Button>
+            Login
+          </Link>
         </div>
         {/* Mobile button area  */}
-        <div className="z-50 md:hidden">
+        <div className="z-[999] relative md:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-white">
             {menuOpen ? (
               <AiOutlineClose className="text-2xl cursor-pointer" />
             ) : (
-              <CiMenuFries className="text-2xl cursor-pointer" />
+              <CiMenuFries className="text-2xl cursor-pointer " />
             )}
           </button>
         </div>
@@ -68,11 +63,11 @@ const Navbar = () => {
 
       {/* Mobile menu  */}
       <div
-        className={`md:hidden fixed top-0 left-0 min-h-screen w-full bg-black/90 z-40 transition-transform duration-500 ${
+        className={`md:hidden fixed top-0 left-0 min-h-screen w-[70%] bg-black/90 z-[60] transition-transform duration-500 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <ul className="flex flex-col items-center gap-6 text-sm tracking-wider text-white py-20">
+        <ul className="flex flex-col items-center gap-6 text-sm tracking-wider text-white py-30">
           <li>
             <NavLink
               onClick={() => setMenuOpen(!menuOpen)}
@@ -94,7 +89,7 @@ const Navbar = () => {
           <li>
             <NavLink
               onClick={() => setMenuOpen(!menuOpen)}
-              to={"/adsfads"}
+              to={"/blog"}
               className="hover:text-blue-400 transition-colors"
             >
               Blog
@@ -103,19 +98,25 @@ const Navbar = () => {
           <li>
             <NavLink
               onClick={() => setMenuOpen(!menuOpen)}
-              to={"/asfddas"}
+              to={"/contact"}
               className="hover:text-blue-400 transition-colors"
             >
               Contact
             </NavLink>
           </li>
-          <div className="mt-6">
-            <Button
-              text="Login"
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+          <div className="mt-3 space-y-3">
+            <Link
+              to={"/"}
+              className="bg-accent px-2 py-2 flex items-center gap-2 text-white group "
             >
-              <CiLogin className="text-xl transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
+              Create Issue
+            </Link>
+            <Link
+              to={"/login"}
+              className="bg-accent px-4 py-2 text-white text-center w-full inline-block"
+            >
+              Login
+            </Link>
           </div>
         </ul>
       </div>

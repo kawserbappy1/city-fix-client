@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 import slidebg5 from "../../../assets/slide-bg5.jpg";
 import {
   FaMapMarkerAlt,
@@ -15,43 +14,6 @@ import {
 } from "react-icons/fa";
 
 const ContactInfo = () => {
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
-
-  const formVariants = {
-    hidden: { x: 50, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 80,
-        delay: 0.5,
-      },
-    },
-  };
-
   const contactInfo = [
     {
       icon: <FaMapMarkerAlt className="w-5 h-5" />,
@@ -140,12 +102,7 @@ const ContactInfo = () => {
 
       <div className="relative z-10 w-full container mx-auto">
         {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "spring" }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h1 className="text-5xl lg:text-6xl font-bold text-white mb-4 font-nunito">
             Get In{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
@@ -157,23 +114,15 @@ const ContactInfo = () => {
             hear from you.
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-accent via-primary to-secondary mx-auto mt-6 rounded-full"></div>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Side - Contact Information */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-2"
-          >
+          <div className="space-y-2">
             {/* Contact Cards */}
             {contactInfo.map((item, index) => (
-              <motion.div
+              <div
                 key={index}
-                variants={itemVariants}
-                whileHover={{ scale: 1.02, y: -5 }}
                 className="bg-white/10 backdrop-blur-lg rounded-2xl p-5 border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group"
               >
                 <div className="flex items-start space-x-4">
@@ -193,42 +142,31 @@ const ContactInfo = () => {
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
 
             {/* Social Media Links */}
-            <motion.div
-              variants={itemVariants}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-xl"
-            >
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-xl">
               <h3 className="text-xl font-bold text-white mb-4">
                 Connect With Us
               </h3>
               <div className="flex space-x-4">
                 {socialLinks.map((social, index) => (
-                  <motion.a
+                  <a
                     key={index}
                     href={social.link}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
                     className={`${social.bgColor} ${social.color} w-12 h-12 flex items-center justify-center rounded-full text-white text-xl transition-all duration-300`}
                     aria-label={social.label}
                   >
                     {social.icon}
-                  </motion.a>
+                  </a>
                 ))}
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Right Side - Contact Form */}
-          <motion.div
-            variants={formVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="lg:mt-0"
-          >
+          <div className="lg:mt-0">
             <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
               <h2 className="text-3xl font-bold text-white mb-2">
                 Send Us a Message
@@ -240,12 +178,7 @@ const ContactInfo = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Field */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="relative"
-                >
+                <div className="relative">
                   <label className="block text-white mb-2">Full Name</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -258,15 +191,10 @@ const ContactInfo = () => {
                       placeholder="John Doe"
                     />
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Email Field */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="relative"
-                >
+                <div className="relative">
                   <label className="block text-white mb-2">Email Address</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -279,15 +207,10 @@ const ContactInfo = () => {
                       placeholder="john@example.com"
                     />
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Message Field */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="relative"
-                >
+                <div className="relative">
                   <label className="block text-white mb-2">Your Message</label>
                   <textarea
                     rows="5"
@@ -295,16 +218,10 @@ const ContactInfo = () => {
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 resize-none"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
-                </motion.div>
+                </div>
 
                 {/* Submit Button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+                <div>
                   <button
                     type="submit"
                     className="w-full py-4 px-6 bg-gradient-to-r from-accent to-primary text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
@@ -312,16 +229,11 @@ const ContactInfo = () => {
                     Send Message
                     <FaPaperPlane className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
-                </motion.div>
+                </div>
               </form>
 
               {/* Form Footer */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-                className="mt-6 pt-6 border-t border-white/20 text-center"
-              >
+              <div className="mt-6 pt-6 border-t border-white/20 text-center">
                 <p className="text-gray-400 text-sm">
                   By submitting this form, you agree to our{" "}
                   <a
@@ -331,27 +243,15 @@ const ContactInfo = () => {
                     Privacy Policy
                   </a>
                 </p>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Floating Elements */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ repeat: Infinity, duration: 3 }}
-          className="absolute top-1/4 left-10 w-4 h-4 bg-accent rounded-full opacity-30"
-        />
-        <motion.div
-          animate={{ y: [0, -15, 0] }}
-          transition={{ repeat: Infinity, duration: 4, delay: 0.5 }}
-          className="absolute bottom-1/4 right-20 w-6 h-6 bg-primary rounded-full opacity-20"
-        />
-        <motion.div
-          animate={{ y: [0, -12, 0] }}
-          transition={{ repeat: Infinity, duration: 3.5, delay: 0.8 }}
-          className="absolute top-1/3 right-10 w-5 h-5 bg-secondary rounded-full opacity-25"
-        />
+        <div className="absolute top-1/4 left-10 w-4 h-4 bg-accent rounded-full opacity-30" />
+        <div className="absolute bottom-1/4 right-20 w-6 h-6 bg-primary rounded-full opacity-20" />
+        <div className="absolute top-1/3 right-10 w-5 h-5 bg-secondary rounded-full opacity-25" />
       </div>
     </div>
   );
