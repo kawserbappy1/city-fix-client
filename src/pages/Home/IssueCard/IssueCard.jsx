@@ -158,7 +158,9 @@ const IssueCard = () => {
         </div>
 
         <div className="">
-          <button className="btn btn-primary w-full">View More</button>
+          <button className="btn  bg-gradient-to-r from-blue-600 to-emerald-600 text-white w-full">
+            View More
+          </button>
         </div>
       </div>
     </motion.div>
