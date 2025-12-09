@@ -10,6 +10,7 @@ import Careers from "./../pages/Careers/Careers";
 import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Auth/Login/Login";
 import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,11 @@ const router = createBrowserRouter([
       },
       {
         path: "blog",
-        element: <Blog></Blog>,
+        element: (
+          <PrivateRoute>
+            <Blog></Blog>,
+          </PrivateRoute>
+        ),
       },
       {
         path: "contact",

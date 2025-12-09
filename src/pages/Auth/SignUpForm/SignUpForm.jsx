@@ -13,10 +13,11 @@ import { Link } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { signUpNewUser, signUpWithGoogle } = useAuth();
+  const { signUpNewUser, signUpWithGoogle, updateUserProfile } = useAuth();
 
   const {
     register,
@@ -33,11 +34,35 @@ const SignUpForm = () => {
   });
 
   const handlesignupform = (data) => {
-    console.log(data);
-
+    const profileImage = data.photo[0];
     signUpNewUser(data.email, data.password)
       .then((result) => {
-        console.log(result.user);
+        const formData = new FormData();
+        formData.append("image", profileImage);
+        axios
+          .post(
+            `https://api.imgbb.com/1/upload?key=${
+              import.meta.env.VITE_IMAGE_HOST
+            }`,
+            formData
+          )
+          .then((res) => {
+            const photoURL = res.data.data.url;
+            const userProfile = {
+              displayName: data.name,
+              photoURL: photoURL,
+            };
+            updateUserProfile(userProfile)
+              .then(() => {})
+              .catch((err) => {
+                console.log(err);
+              });
+            // const userInfo = {
+            //   email: data.email,
+            //   displayName: data.name,
+            //   photoURL: photoURL,
+            // };
+          });
         reset();
         toast.success("sign up successfully");
       })
