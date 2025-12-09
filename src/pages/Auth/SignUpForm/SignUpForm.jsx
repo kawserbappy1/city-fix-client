@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { user, signUpNewUser, signUpWithGoogle } = useAuth();
+  const { signUpNewUser, signUpWithGoogle } = useAuth();
 
   const {
     register,
@@ -38,6 +38,7 @@ const SignUpForm = () => {
     signUpNewUser(data.email, data.password)
       .then((result) => {
         console.log(result.user);
+        reset();
         toast.success("sign up successfully");
       })
       .catch((err) => {

@@ -1,12 +1,56 @@
 import { Link, NavLink } from "react-router";
 import Logo from "./Logo";
-import { CiLogin, CiMenuFries } from "react-icons/ci";
+import { CiMenuFries } from "react-icons/ci";
 import { AiOutlineClose } from "react-icons/ai";
-import { useState } from "react";
-import { MdOutlineEdit } from "react-icons/md";
+import { useState, useRef, useEffect } from "react";
+import useAuth from "../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { user, logOut } = useAuth();
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogOut = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to log out?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logOut()
+          .then(() => {
+            setDropdownOpen(false);
+            Swal.fire(
+              "Logged Out!",
+              "You have been successfully logged out.",
+              "success"
+            );
+          })
+          .catch((err) => {
+            Swal.fire("Error!", err.message, "error");
+          });
+      }
+    });
+  };
+
   const links = (
     <>
       <li className="link-hover">
@@ -26,42 +70,166 @@ const Navbar = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full z-50 bg-transparent px-2">
-      <nav className="container mx-auto flex items-center justify-between h-16 px-2  shadow bg-black/70 rounded-full backdrop-blur-2xl z-50">
-        {/* logo area  */}
+      <nav className="container mx-auto flex items-center justify-between h-16 px-2 shadow bg-black/70 rounded-full backdrop-blur-2xl z-50">
+        {/* logo area */}
         <span>
           <Logo></Logo>
         </span>
-        {/* menu area  */}
+        {/* menu area */}
         <div className="hidden md:block">
           <ul className="flex items-center gap-4 text-sm tracking-wider text-white">
             {links}
           </ul>
         </div>
-        {/* button area  */}
-        <div className="hidden md:flex gap-2">
-          <Link to={"/"} className="bg-accent px-2 py-2  text-white group ">
+        {/* button area with profile dropdown */}
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            to={"/"}
+            className="bg-accent px-4 py-2 text-white rounded-full hover:bg-accent/80 transition"
+          >
             Create Issue
           </Link>
-          <Link
-            to={"/login"}
-            className="bg-accent px-4 py-2 text-white group rounded-full "
-          >
-            Login
-          </Link>
+
+          {user ? (
+            <div className="relative" ref={dropdownRef}>
+              {/* Profile Picture Button */}
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 hover:border-white/50 transition-all"
+              >
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                    {user?.displayName?.charAt(0) || "U"}
+                  </div>
+                )}
+              </button>
+
+              {/* Dropdown Menu */}
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+                  {/* User Info */}
+                  <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden">
+                        {user?.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                            {user?.displayName?.charAt(0) || "U"}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800 text-sm">
+                          {user?.displayName || "User"}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email || "user@example.com"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                        />
+                      </svg>
+                      Dashboard
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      Edit Profile
+                    </Link>
+
+                    <button
+                      onClick={handleLogOut}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors border-t border-gray-100"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to={"/login"}
+              className="bg-accent px-4 py-2 text-white rounded-full hover:bg-accent/80 transition"
+            >
+              Login
+            </Link>
+          )}
         </div>
-        {/* Mobile button area  */}
+
+        {/* Mobile button area */}
         <div className="z-[999] relative md:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-white">
             {menuOpen ? (
               <AiOutlineClose className="text-2xl cursor-pointer" />
             ) : (
-              <CiMenuFries className="text-2xl cursor-pointer " />
+              <CiMenuFries className="text-2xl cursor-pointer" />
             )}
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu  */}
+      {/* Mobile menu */}
       <div
         className={`md:hidden fixed top-0 left-0 min-h-screen w-[70%] bg-black/90 z-[60] transition-transform duration-500 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"

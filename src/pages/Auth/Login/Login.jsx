@@ -7,29 +7,61 @@ import {
   FaGoogle,
 } from "react-icons/fa";
 import { Link } from "react-router";
-import { motion } from "framer-motion";
+import useAuth from "../../../hooks/useAuth";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { SignInUser, signUpWithGoogle } = useAuth();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  const handlesignupform = (data) => {
+    console.log(data);
+    SignInUser(data.email, data.password)
+      .then((result) => {
+        toast.success("Login succefully");
+      })
+      .catch((error) => {
+        if (error.code === "auth/invalid-credential") {
+          toast.error("Email or password is incorrect");
+        } else if (error.code === "auth/user-not-found") {
+          toast.error("No account found with this email");
+        } else if (error.code === "auth/wrong-password") {
+          toast.error("Wrong password. Try again!");
+        } else {
+          toast.error(error.message);
+        }
+      });
+  };
+  const handleGoogleSignUp = () => {
+    signUpWithGoogle()
+      .then((result) => {
+        toast.success("sign up successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 pt-30">
       <div className="max-w-md w-full">
-        {/* Animated Background Elements */}
+        {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
           <div className="absolute top-40 -left-20 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
           <div className="absolute -bottom-40 left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
 
-        {/* Main Form Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20"
-        >
-          {/* Decorative Elements */}
+        {/* Main Card */}
+        <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
+          {/* Decorations */}
           <div className="absolute -top-3 -left-3 w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
           <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
           <div className="absolute -top-3 -right-3 w-8 h-8 border-2 border-orange-400 rounded-full"></div>
@@ -37,14 +69,9 @@ const LoginForm = () => {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
-            >
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <FaLock className="text-white text-2xl" />
-            </motion.div>
+            </div>
             <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
               Welcome Back
             </h2>
@@ -54,164 +81,121 @@ const LoginForm = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
-            {/* Email Field */}
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="relative group"
-            >
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors">
-                <FaEnvelope />
-              </div>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                required
-                className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md"
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+          <form className="space-y-6" onSubmit={handleSubmit(handlesignupform)}>
+            {/* Email Field with Fixed Icon Position */}
+            <div className="space-y-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaEnvelope className="text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  {...register("email", { required: true })}
+                  className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all shadow-sm hover:shadow-md"
                 />
               </div>
-            </motion.div>
-
-            {/* Password Field */}
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="relative group"
-            >
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors">
-                <FaLock />
+              {/* Error Message Container with Fixed Height */}
+              <div className="min-h-[20px]">
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">Email is required</p>
+                )}
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                required
-                className="w-full pl-10 pr-12 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-500 transition-colors"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </motion.div>
+            </div>
 
-            {/* Forgot Password Link */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-right"
-            >
+            {/* Password Field with Fixed Icon Position */}
+            <div className="space-y-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="text-gray-400" />
+                </div>
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  {...register("password", { required: true })}
+                  className="w-full pl-10 pr-12 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all shadow-sm hover:shadow-md"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-purple-600 transition-colors"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              {/* Error Message Container with Fixed Height */}
+              <div className="min-h-[20px]">
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">
+                    Password is required
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Forgot Password */}
+            <div className="text-right pt-1">
               <Link
                 to="/forgot-password"
-                className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors inline-flex items-center"
+                className="text-sm text-purple-600 hover:text-purple-800 font-medium"
               >
-                <span className="border-b border-transparent hover:border-purple-600 transition-all">
-                  Forgot your password?
-                </span>
+                Forgot your password?
               </Link>
-            </motion.div>
+            </div>
 
             {/* Login Button */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <div>
               <button
                 type="submit"
-                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-emerald-700 transition-all duration-500 transform group"
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all"
               >
                 Log In
               </button>
-            </motion.div>
+            </div>
 
             {/* Divider */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="relative flex items-center py-4"
-            >
+            <div className="relative flex items-center py-4">
               <div className="flex-grow border-t border-gray-300"></div>
-              <span className="flex-shrink mx-4 text-gray-500 text-sm">
+              <span className="mx-4 text-gray-500 text-sm">
                 Or continue with
               </span>
               <div className="flex-grow border-t border-gray-300"></div>
-            </motion.div>
+            </div>
 
-            {/* Google Login Button */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            {/* Google Button */}
+            <div>
               <button
+                onClick={handleGoogleSignUp}
                 type="button"
-                className="w-full py-3 px-6 bg-white border-2 border-gray-200 text-gray-700 font-medium rounded-xl shadow-sm hover:shadow-md hover:border-red-300 hover:bg-red-50 transition-all duration-300 flex items-center justify-center space-x-3"
+                className="w-full py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl shadow-sm hover:shadow-md hover:border-red-300 hover:bg-red-50 transition-all flex items-center justify-center gap-3"
               >
                 <FaGoogle className="text-red-500 text-xl" />
-                <span>Sign in with Google</span>
+                Sign in with Google
               </button>
-            </motion.div>
+            </div>
 
             {/* Sign Up Link */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="text-center pt-6 border-t border-gray-100"
-            >
+            <div className="text-center pt-6 border-t border-gray-100">
               <p className="text-gray-600">
                 Don't have an account?{" "}
                 <Link
                   to="/sign-up"
-                  className="text-purple-600 hover:text-purple-800 font-semibold transition-colors inline-flex items-center"
+                  className="text-purple-600 hover:text-purple-800 font-semibold"
                 >
                   Sign up now
-                  <svg
-                    className="w-4 h-4 ml-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
                 </Link>
               </p>
-            </motion.div>
+            </div>
           </form>
-        </motion.div>
+        </div>
 
-        {/* Footer Note */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-center text-gray-500 text-sm mt-8"
-        >
+        {/* Footer */}
+        <p className="text-center text-gray-500 text-sm mt-8">
           By signing in, you agree to our Terms of Service and Privacy Policy
-        </motion.p>
+        </p>
       </div>
     </div>
   );
