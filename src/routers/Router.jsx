@@ -15,6 +15,7 @@ import CreateIssue from "../pages/CreateIssue/CreateIssue";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Overview from "../pages/Dashboard/Overview/Overview";
 import Users from "../pages/Dashboard/Users/Users";
+import AllIssues from "../pages/Dashboard/AllIssues/AllIssues";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,15 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <Users />,
+      },
+      {
+        path: "all-issues",
+        element: <AllIssues></AllIssues>,
+      },
+      {
+        path: "create-issue",
+        element: <CreateIssue></CreateIssue>,
+        loader: () => fetch("public/area.json").then((res) => res.json()),
       },
     ],
   },

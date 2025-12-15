@@ -11,6 +11,7 @@ import {
   FiBell,
   FiLogOut,
 } from "react-icons/fi";
+import { FaBoxTissue, FaRegEdit } from "react-icons/fa";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,12 +20,24 @@ const DashboardLayout = () => {
   // Define your menu items here
   const menuItems = [
     { path: "/dashboard", label: "Overview", icon: <FiHome />, end: true },
+    {
+      path: "/dashboard/create-issue",
+      label: "Create Issue",
+      icon: <FaRegEdit />,
+      end: true,
+    },
+    {
+      path: "/dashboard/all-issues",
+      label: "All Issues",
+      icon: <FaBoxTissue />,
+      end: true,
+    },
     { path: "/dashboard/users", label: "All Users", icon: <FiUsers /> },
     { path: "/dashboard/settings", label: "Settings", icon: <FiSettings /> },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans">
+    <div className="flex h-screen bg-gray-50 ">
       {/* --- Mobile Sidebar Overlay --- */}
       {isSidebarOpen && (
         <div
@@ -113,7 +126,7 @@ const DashboardLayout = () => {
           </div>
           <div className="hidden md:flex">
             <p className="text-red-500 font-poppins font-bold">
-              You are free User
+              You are a free User
             </p>
           </div>
           {/* Right Header Icons */}
