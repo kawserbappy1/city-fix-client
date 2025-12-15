@@ -12,6 +12,9 @@ import Login from "../pages/Auth/Login/Login";
 import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
 import PrivateRoute from "./PrivateRoute";
 import CreateIssue from "../pages/CreateIssue/CreateIssue";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Overview from "../pages/Dashboard/Overview/Overview";
+import Users from "../pages/Dashboard/Users/Users";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +40,7 @@ const router = createBrowserRouter([
             <CreateIssue></CreateIssue>,
           </PrivateRoute>
         ),
+        loader: () => fetch("public/area.json").then((res) => res.json()),
       },
       {
         path: "contact",
@@ -71,6 +75,24 @@ const router = createBrowserRouter([
       {
         path: "sign-up",
         element: <SignUpForm></SignUpForm>,
+      },
+    ],
+  },
+  {
+    path: "dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Overview></Overview>,
+      },
+      {
+        path: "users",
+        element: <Users />,
       },
     ],
   },

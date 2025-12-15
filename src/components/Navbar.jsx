@@ -38,6 +38,7 @@ const Navbar = () => {
         logOut()
           .then(() => {
             setDropdownOpen(false);
+            setMenuOpen(false); // Close mobile menu on logout
             Swal.fire(
               "Logged Out!",
               "You have been successfully logged out.",
@@ -217,9 +218,32 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile button area */}
-        <div className="z-[999] relative md:hidden">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-white">
+        {/* Mobile button area - Show user avatar on mobile when logged in */}
+        <div className="flex items-center gap-2 md:hidden">
+          {user && (
+            <div className="flex items-center gap-2 mr-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/30">
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                    {user?.displayName?.charAt(0) || "U"}
+                  </div>
+                )}
+              </div>
+              <span className="text-white text-sm font-medium hidden sm:block">
+                {user?.displayName?.split(" ")[0] || "User"}
+              </span>
+            </div>
+          )}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-white z-[999] relative"
+          >
             {menuOpen ? (
               <AiOutlineClose className="text-2xl cursor-pointer" />
             ) : (
@@ -229,64 +253,155 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - Updated with user profile section */}
       <div
-        className={`md:hidden fixed top-0 left-0 min-h-screen w-[70%] bg-black/90 z-[60] transition-transform duration-500 ${
+        className={`md:hidden fixed top-0 left-0 min-h-screen w-[70%] bg-black/95 z-[60] transition-transform duration-500 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <ul className="flex flex-col items-center gap-6 text-sm tracking-wider text-white py-30">
-          <li>
+        {/* User Profile Section in Mobile Menu */}
+        {user && (
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white/30">
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
+                    {user?.displayName?.charAt(0) || "U"}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-bold text-lg">
+                  {user?.displayName || "User"}
+                </h3>
+                <p className="text-gray-300 text-sm truncate">
+                  {user?.email || "user@example.com"}
+                </p>
+              </div>
+            </div>
+
+            {/* Mobile User Actions */}
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                to="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-lg transition-colors text-sm"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="bg-purple-600 hover:bg-purple-700 text-white text-center py-2 px-3 rounded-lg transition-colors text-sm"
+              >
+                Edit Profile
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Links */}
+        <ul className="flex flex-col items-start gap-4 text-sm tracking-wider text-white p-6">
+          <li className="w-full">
             <NavLink
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setMenuOpen(false)}
               to={"/"}
-              className="hover:text-blue-400 transition-colors"
+              className="block py-3 px-4 hover:bg-white/10 rounded-lg transition-colors"
             >
               Home
             </NavLink>
           </li>
-          <li>
+          <li className="w-full">
             <NavLink
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setMenuOpen(false)}
               to={"/dsfds"}
-              className="hover:text-blue-400 transition-colors"
+              className="block py-3 px-4 hover:bg-white/10 rounded-lg transition-colors"
             >
               All Issues
             </NavLink>
           </li>
-          <li>
+          <li className="w-full">
             <NavLink
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setMenuOpen(false)}
               to={"/blog"}
-              className="hover:text-blue-400 transition-colors"
+              className="block py-3 px-4 hover:bg-white/10 rounded-lg transition-colors"
             >
               Blog
             </NavLink>
           </li>
-          <li>
+          <li className="w-full">
             <NavLink
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setMenuOpen(false)}
               to={"/contact"}
-              className="hover:text-blue-400 transition-colors"
+              className="block py-3 px-4 hover:bg-white/10 rounded-lg transition-colors"
             >
               Contact
             </NavLink>
           </li>
-          <div className="mt-3 space-y-3">
+
+          {/* Create Issue Button - Always visible */}
+          <li className="w-full mt-4">
             <Link
-              to={"/"}
-              className="bg-accent px-2 py-2 flex items-center gap-2 text-white group "
+              to={"/create-issue"}
+              onClick={() => setMenuOpen(false)}
+              className="block bg-accent text-white text-center py-3 px-4 rounded-lg hover:bg-accent/80 transition-colors"
             >
               Create Issue
             </Link>
-            <Link
-              to={"/login"}
-              className="bg-accent px-4 py-2 text-white text-center w-full inline-block"
-            >
-              Login
-            </Link>
-          </div>
+          </li>
+
+          {/* Login/Logout Section */}
+          <li className="w-full mt-6">
+            {user ? (
+              <button
+                onClick={() => {
+                  handleLogOut();
+                  setMenuOpen(false);
+                }}
+                className="w-full bg-red-600 hover:bg-red-700 text-white text-center py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                Logout
+              </button>
+            ) : (
+              <Link
+                to={"/login"}
+                onClick={() => setMenuOpen(false)}
+                className="block bg-accent text-white text-center py-3 px-4 rounded-lg hover:bg-accent/80 transition-colors"
+              >
+                Login
+              </Link>
+            )}
+          </li>
         </ul>
+
+        {/* Footer for mobile menu */}
+        {user && (
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-700">
+            <div className="text-center text-gray-400 text-xs">
+              <p>Logged in as {user?.email?.split("@")[0] || "user"}</p>
+              <p className="mt-1">Click logout to end session</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

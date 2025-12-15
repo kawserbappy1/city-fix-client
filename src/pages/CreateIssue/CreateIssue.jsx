@@ -1,17 +1,146 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useLoaderData } from "react-router";
+import axios from "axios";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
+import useAuth from "../../hooks/useAuth";
 
 const CreateIssue = () => {
+  const areas = useLoaderData();
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
+  const [imagePreview, setImagePreview] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+    setValue,
+    trigger,
+    control,
+    reset,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    // Handle form submission here
+  // Watch the division and district fields
+  const selectedDivision = useWatch({
+    control,
+    name: "division",
+    defaultValue: "",
+  });
+
+  const selectedDistrict = useWatch({
+    control,
+    name: "district",
+    defaultValue: "",
+  });
+
+  // Get unique divisions
+  const areasDuplicate = areas.map((area) => area.region);
+  const divisions = [...new Set(areasDuplicate)];
+
+  // Get districts for the selected division
+  const districtsByDivision = (division) => {
+    if (!division) return [];
+    const regionDistricts = areas.filter((area) => area.region === division);
+    const districts = regionDistricts.map((d) => d.district);
+    // Remove duplicate districts
+    return [...new Set(districts)];
+  };
+
+  // Get upazilas for the selected district
+  const upazilasByDistrict = (district) => {
+    if (!district || !selectedDivision) return [];
+    const areaData = areas.find(
+      (area) => area.region === selectedDivision && area.district === district
+    );
+    return areaData ? areaData.covered_area : [];
+  };
+
+  // Get current districts based on selected division
+  const currentDistricts = districtsByDivision(selectedDivision);
+
+  // Get current upazilas based on selected district
+  const currentUpazilas = upazilasByDistrict(selectedDistrict);
+
+  const onSubmit = async (data) => {
+    const issueCoverImage = data.issueImage;
+    const formData = new FormData();
+    formData.append("image", issueCoverImage);
+
+    try {
+      const response = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOST}`,
+        formData
+      );
+      console.log("✅ Upload successful:", response.data);
+      const issueImageURL = response.data.data.url;
+      const issueInfo = { ...data, issueImageURL };
+      Swal.fire({
+        title: "Confirm the Issue",
+        text: `Are you sure to post this issue`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axiosSecure
+            .post("/issues", issueInfo)
+            .then((res) => {
+              reset();
+              if (res.data.insertedId) {
+                Swal.fire({
+                  position: "top-end",
+                  icon: "success",
+                  title:
+                    "Your Issue Successfully Added. You will be notified when admin approve your post.",
+                  showConfirmButton: false,
+                  timer: 2500,
+                });
+              }
+            })
+            .catch((error) => console.log(error));
+        }
+      });
+    } catch (error) {
+      console.error("❌ Upload failed:", error.response?.data || error.message);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+      if (!validTypes.includes(file.type)) {
+        alert("Please upload a valid image file (JPEG, PNG, GIF)");
+        return;
+      }
+
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        return;
+      }
+
+      setValue("issueImage", file);
+      trigger("issueImage");
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Remove image
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setValue("issueImage", null);
+    trigger("issueImage");
   };
 
   const categories = [
@@ -26,7 +155,7 @@ const CreateIssue = () => {
     "Traffic & Signals",
   ];
 
-  const priorities = ["Low", "Medium", "High", "Urgent"];
+  const priorities = ["Low", "Medium", "High"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-25 px-4">
@@ -49,45 +178,85 @@ const CreateIssue = () => {
             <label className="block text-sm font-semibold text-gray-700">
               Issue Image <span className="text-red-500">*</span>
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors">
-              <div className="space-y-1 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+
+            {imagePreview ? (
+              // Preview Mode
+              <div className="relative">
+                <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-64 object-cover"
                   />
-                </svg>
-                <div className="flex text-sm text-gray-600">
-                  <label
-                    htmlFor="issueImage"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
-                  >
-                    <span>Upload a file</span>
-                    <input
-                      id="issueImage"
-                      type="file"
-                      accept="image/*"
-                      {...register("issueImage", {
-                        required: "Issue image is required",
-                      })}
-                      className="sr-only"
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  PNG, JPG, GIF up to 10MB
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                  title="Remove image"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+                <p className="text-xs text-gray-500 mt-1 text-center">
+                  Click the X button to change image
                 </p>
               </div>
-            </div>
+            ) : (
+              // Upload Mode
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors">
+                <div className="space-y-1 text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <div className="flex text-sm text-gray-600 justify-center">
+                    <label
+                      htmlFor="issueImage"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="issueImage"
+                        type="file"
+                        accept="image/*"
+                        {...register("issueImage", {
+                          required: "Issue image is required",
+                        })}
+                        onChange={handleImageChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, GIF up to 10MB
+                  </p>
+                </div>
+              </div>
+            )}
+
             {errors.issueImage && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.issueImage.message}
@@ -151,27 +320,16 @@ const CreateIssue = () => {
             {/* Posted By */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
-                Posted By <span className="text-red-500">*</span>
+                Posted By
               </label>
               <input
                 type="text"
                 placeholder="Your full name"
-                {...register("postedBy", {
-                  required: "Name is required",
-                  pattern: {
-                    value: /^[A-Za-z\s]+$/,
-                    message: "Only letters and spaces allowed",
-                  },
-                })}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
-                  errors.postedBy ? "border-red-500" : "border-gray-300"
-                }`}
+                defaultValue={user.displayName}
+                readOnly
+                {...register("postedBy")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
               />
-              {errors.postedBy && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.postedBy.message}
-                </p>
-              )}
             </div>
 
             {/* Email */}
@@ -181,21 +339,42 @@ const CreateIssue = () => {
               </label>
               <input
                 type="email"
+                defaultValue={user.email}
+                readOnly
                 placeholder="your.email@example.com"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                {...register("email")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition `}
+              />
+            </div>
+
+            {/* Division - Select Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Division <span className="text-red-500">*</span>
+              </label>
+              <select
+                {...register("division", {
+                  required: "Division is required",
+                  onChange: (e) => {
+                    // Reset district and upazila when division changes
+                    setValue("district", "");
+                    setValue("upazila", "");
                   },
                 })}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
-                  errors.email ? "border-red-500" : "border-gray-300"
+                  errors.division ? "border-red-500" : "border-gray-300"
                 }`}
-              />
-              {errors.email && (
+              >
+                <option value="">Select division</option>
+                {divisions.map((division) => (
+                  <option key={division} value={division}>
+                    {division}
+                  </option>
+                ))}
+              </select>
+              {errors.division && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
+                  {errors.division.message}
                 </p>
               )}
             </div>
@@ -206,13 +385,28 @@ const CreateIssue = () => {
                 District <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("district", { required: "District is required" })}
+                {...register("district", {
+                  required: "District is required",
+                  disabled: !selectedDivision, // Disable if no division selected
+                  onChange: (e) => {
+                    // Reset upazila when district changes
+                    setValue("upazila", "");
+                  },
+                })}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
                   errors.district ? "border-red-500" : "border-gray-300"
-                }`}
+                } ${!selectedDivision ? "bg-gray-100 cursor-not-allowed" : ""}`}
               >
-                <option value="">Select district</option>
-                {/* District options will be loaded from API */}
+                <option value="">
+                  {selectedDivision
+                    ? "Select district"
+                    : "Please select division first"}
+                </option>
+                {currentDistricts.map((district, i) => (
+                  <option key={i} value={district}>
+                    {district}
+                  </option>
+                ))}
               </select>
               {errors.district && (
                 <p className="text-red-500 text-sm mt-1">
@@ -227,13 +421,24 @@ const CreateIssue = () => {
                 Upazila <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("upazila", { required: "Upazila is required" })}
+                {...register("upazila", {
+                  required: "Upazila is required",
+                  disabled: !selectedDistrict, // Disable if no district selected
+                })}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
                   errors.upazila ? "border-red-500" : "border-gray-300"
-                }`}
+                } ${!selectedDistrict ? "bg-gray-100 cursor-not-allowed" : ""}`}
               >
-                <option value="">Select upazila</option>
-                {/* Upazila options will be loaded from API */}
+                <option value="">
+                  {selectedDistrict
+                    ? "Select upazila"
+                    : "Please select district first"}
+                </option>
+                {currentUpazilas.map((upazila, i) => (
+                  <option key={i} value={upazila}>
+                    {upazila}
+                  </option>
+                ))}
               </select>
               {errors.upazila && (
                 <p className="text-red-500 text-sm mt-1">
@@ -323,14 +528,27 @@ const CreateIssue = () => {
           {/* Description (formerly Additional Notes) */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               placeholder="Detailed description of the issue..."
               rows="4"
-              {...register("description")}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+              {...register("description", {
+                required: "Description is required",
+                minLength: {
+                  value: 10,
+                  message: "Minimum 10 characters required",
+                },
+              })}
+              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none ${
+                errors.description ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
