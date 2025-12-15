@@ -11,6 +11,7 @@ import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Auth/Login/Login";
 import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
 import PrivateRoute from "./PrivateRoute";
+import CreateIssue from "../pages/CreateIssue/CreateIssue";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Blog></Blog>,
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "create-issue",
+        element: (
+          <PrivateRoute>
+            <CreateIssue></CreateIssue>,
           </PrivateRoute>
         ),
       },

@@ -9,7 +9,7 @@ import {
   FaGoogle,
   FaUpload,
 } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -17,7 +17,10 @@ import axios from "axios";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
   const { signUpNewUser, signUpWithGoogle, updateUserProfile } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -53,18 +56,22 @@ const SignUpForm = () => {
               photoURL: photoURL,
             };
             updateUserProfile(userProfile)
-              .then(() => {})
+              .then(() => {
+                navigate(location.state?.from?.pathname || "/", {
+                  replace: true,
+                });
+              })
               .catch((err) => {
                 console.log(err);
               });
+            reset();
+            toast.success("sign up successfully");
             // const userInfo = {
             //   email: data.email,
             //   displayName: data.name,
             //   photoURL: photoURL,
             // };
           });
-        reset();
-        toast.success("sign up successfully");
       })
       .catch((err) => {
         if (err?.code === "auth/email-already-in-use") {
@@ -77,6 +84,9 @@ const SignUpForm = () => {
   const handleGoogleSignUp = () => {
     signUpWithGoogle()
       .then((result) => {
+        navigate(location.state?.from?.pathname || "/", {
+          replace: true,
+        });
         toast.success("sign up successfully");
       })
       .catch((error) => {
@@ -119,7 +129,19 @@ const SignUpForm = () => {
             <div className="relative group cursor-pointer">
               <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                 <div className="w-full h-full flex items-center justify-center">
-                  <FaUser className="text-gray-400 text-5xl" />
+                  <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                    {previewImage ? (
+                      <img
+                        src={previewImage}
+                        alt="Profile Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FaUser className="text-gray-400 text-5xl" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -131,6 +153,13 @@ const SignUpForm = () => {
                 type="file"
                 accept="image/*"
                 {...register("photo")}
+                onChange={(e) => {
+                  register("photo").onChange(e);
+                  const file = e.target.files[0];
+                  if (file) {
+                    setPreviewImage(URL.createObjectURL(file));
+                  }
+                }}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
             </div>

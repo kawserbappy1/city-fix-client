@@ -84,7 +84,7 @@ const Navbar = () => {
         {/* button area with profile dropdown */}
         <div className="hidden md:flex items-center gap-2">
           <Link
-            to={"/"}
+            to={"/create-issue"}
             className="bg-accent px-4 py-2 text-white rounded-full hover:bg-accent/80 transition"
           >
             Create Issue
