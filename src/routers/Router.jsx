@@ -11,13 +11,14 @@ import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Auth/Login/Login";
 import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
 import PrivateRoute from "./PrivateRoute";
-import CreateIssue from "../pages/CreateIssue/CreateIssue";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Overview from "../pages/Dashboard/Overview/Overview";
 import Users from "../pages/Dashboard/Users/Users";
 import AllIssues from "../pages/Dashboard/AllIssues/AllIssues";
 import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
+import MyIssues from "../pages/Dashboard/MyIssues/MyIssues";
+import CreateIssue from "../pages/Dashboard/CreateIssue/CreateIssue";
 
 const router = createBrowserRouter([
   {
@@ -47,15 +48,6 @@ const router = createBrowserRouter([
             <IssueDetails></IssueDetails>
           </PrivateRoute>
         ),
-      },
-      {
-        path: "create-issue",
-        element: (
-          <PrivateRoute>
-            <CreateIssue></CreateIssue>,
-          </PrivateRoute>
-        ),
-        loader: () => fetch("public/area.json").then((res) => res.json()),
       },
       {
         path: "contact",
@@ -114,9 +106,13 @@ const router = createBrowserRouter([
         element: <AllIssues></AllIssues>,
       },
       {
+        path: "my-issues",
+        element: <MyIssues></MyIssues>,
+      },
+      {
         path: "create-issue",
         element: <CreateIssue></CreateIssue>,
-        loader: () => fetch("public/area.json").then((res) => res.json()),
+        loader: () => fetch("/area.json").then((res) => res.json()),
       },
     ],
   },

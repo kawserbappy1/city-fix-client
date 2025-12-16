@@ -11,7 +11,7 @@ import {
   FiBell,
   FiLogOut,
 } from "react-icons/fi";
-import { FaBoxTissue, FaRegEdit } from "react-icons/fa";
+import { FaBoxTissue, FaPencilRuler, FaRegEdit } from "react-icons/fa";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,6 +20,13 @@ const DashboardLayout = () => {
   // Define your menu items here
   const menuItems = [
     { path: "/dashboard", label: "Overview", icon: <FiHome />, end: true },
+
+    {
+      path: "/dashboard/my-issues",
+      label: "My-Issues",
+      icon: <FaPencilRuler />,
+      end: true,
+    },
     {
       path: "/dashboard/create-issue",
       label: "Create Issue",
@@ -83,8 +90,12 @@ const DashboardLayout = () => {
         {/* Bottom Action */}
         <div className="absolute bottom-0 w-full p-4 border-t border-gray-100">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-12 h-12 ">
-              <img src={user.photoURL} alt="" className=" rounded-full" />
+            <div className="w-12 h-12">
+              <img
+                src={user.photoURL}
+                alt=""
+                className="w-12 h-12 rounded-full "
+              />
             </div>
             <div>
               <p className=" font-bold capitalize">{user.displayName}</p>
@@ -137,7 +148,11 @@ const DashboardLayout = () => {
             </button>
             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 border-2 border-white shadow-sm">
               <div className="w-10 h-10 ">
-                <img src={user.photoURL} alt="" className=" rounded-full" />
+                <img
+                  src={user.photoURL}
+                  alt=""
+                  className=" rounded-full w-10 h-10 "
+                />
               </div>
             </div>
           </div>

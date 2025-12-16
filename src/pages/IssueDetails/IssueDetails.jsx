@@ -10,39 +10,26 @@ import {
   FiClock,
 } from "react-icons/fi";
 
-const IssueDetails = () => {
-  // Sample data - replace with your actual data from API
-  const issue = {
-    issueName: "Kasper Cook with culbart area",
-    category: "Parks & Green Spaces",
-    postedBy: "Md. Kawser Hamid",
-    email: "bappydu2015@gmail.com",
-    division: "Chattogram",
-    district: "Cumilla",
-    upazila: "Laksam",
-    priority: "High",
-    phoneNumber: "01520090603",
-    address: "245.surjasen hall, university of Dhaka",
-    description:
-      "Self-Healing Pavements: These materials contain microcapsules filled with asphalt-repair agents. When cracks form, the capsules break open, releasing the healing agents that fill and seal the cracks automatically.",
-    issueImageURL: "https://i.ibb.co/CLYx6Lh/blog2.jpg",
-    status: "approved",
-    createdAt: "2025-12-15T20:26:38.060+00:00",
-    approvedAt: "2025-12-15T21:34:19.765+00:00",
-  };
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useParams } from "react-router";
+import { formatExactDate } from "../../Utilities/formatDate";
+import Loader from "../../components/Loader";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+const IssueDetails = () => {
+  const axiosSecure = useAxiosSecure();
+  const { id } = useParams();
+  const { data: issue, isLoading } = useQuery({
+    queryKey: ["issue", id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/approve-issues/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+  });
+
+  console.log(issue);
 
   // Get priority badge color
   const getPriorityColor = (priority) => {
@@ -57,18 +44,24 @@ const IssueDetails = () => {
         return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
-
+  if (isLoading) {
+    return <Loader></Loader>;
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto py-20">
+        <div className="mb-2 text-blue-600 flex items-center gap-2">
+          <IoIosArrowRoundBack className=" animate-ping" />
+          <Link to={"/all-issues"}>Back to issu page</Link>
+        </div>
         {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
             <li>Home</li>
-            <li className="text-gray-400">›</li>
+            <li className="text-gray-400">/</li>
             <li>Issues</li>
-            <li className="text-gray-400">›</li>
-            <li className="text-blue-600 font-medium">{issue.issueName}</li>
+            <li className="text-gray-400">/</li>
+            <li className="text-blue-600 font-medium">{issue?.issueName}</li>
           </ol>
         </nav>
 
@@ -79,22 +72,22 @@ const IssueDetails = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
               <div className="relative h-64 sm:h-80 md:h-96">
                 <img
-                  src={issue.issueImageURL}
-                  alt={issue.issueName}
+                  src={issue?.issueImageURL}
+                  alt={issue?.issueName}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4">
                   <span
                     className={`px-4 py-2 rounded-full text-sm font-semibold border ${getPriorityColor(
-                      issue.priority
+                      issue?.priority
                     )}`}
                   >
-                    {issue.priority} Priority
+                    {issue?.priority} Priority
                   </span>
                 </div>
                 <div className="absolute top-4 right-4">
                   <span className="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-semibold border border-blue-100">
-                    {issue.category}
+                    {issue?.category}
                   </span>
                 </div>
               </div>
@@ -104,16 +97,16 @@ const IssueDetails = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {issue.issueName}
+                  {issue?.issueName}
                 </h1>
                 <span className="px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-semibold border border-green-100">
-                  {issue.status}
+                  {issue?.status}
                 </span>
               </div>
 
               <div className="prose max-w-none">
                 <p className="text-gray-700 leading-relaxed">
-                  {issue.description}
+                  {issue?.description}
                 </p>
               </div>
 
@@ -127,26 +120,30 @@ const IssueDetails = () => {
                   <div className="bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm text-gray-500 mb-1">Division</p>
                     <p className="font-medium text-gray-800">
-                      {issue.division}
+                      {issue?.division}
                     </p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm text-gray-500 mb-1">District</p>
                     <p className="font-medium text-gray-800">
-                      {issue.district}
+                      {issue?.district}
                     </p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm text-gray-500 mb-1">Upazila</p>
-                    <p className="font-medium text-gray-800">{issue.upazila}</p>
+                    <p className="font-medium text-gray-800">
+                      {issue?.upazila}
+                    </p>
                   </div>
                 </div>
-                {issue.address && (
+                {issue?.address && (
                   <div className="mt-4 bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm text-gray-500 mb-1">
                       Complete Address
                     </p>
-                    <p className="font-medium text-gray-800">{issue.address}</p>
+                    <p className="font-medium text-gray-800">
+                      {issue?.address}
+                    </p>
                   </div>
                 )}
               </div>
@@ -237,7 +234,7 @@ const IssueDetails = () => {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-xl">
-                    {issue.postedBy
+                    {issue?.postedBy
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
@@ -245,7 +242,7 @@ const IssueDetails = () => {
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 text-lg">
-                    {issue.postedBy}
+                    {issue?.postedBy}
                   </h4>
                   <p className="text-gray-600 text-sm">Issue Reporter</p>
                 </div>
@@ -259,7 +256,7 @@ const IssueDetails = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium text-gray-800">{issue.email}</p>
+                    <p className="font-medium text-gray-800">{issue?.email}</p>
                   </div>
                 </div>
 
@@ -270,7 +267,7 @@ const IssueDetails = () => {
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
                     <p className="font-medium text-gray-800">
-                      {issue.phoneNumber}
+                      {issue?.phoneNumber}
                     </p>
                   </div>
                 </div>
@@ -289,7 +286,7 @@ const IssueDetails = () => {
                   <div className="absolute left-0 top-0 w-3 h-3 bg-green-500 rounded-full border-4 border-white"></div>
                   <p className="text-sm text-gray-500">Issue Created</p>
                   <p className="font-medium text-gray-800">
-                    {formatDate(issue.createdAt)}
+                    {formatExactDate(issue?.createdAt)}
                   </p>
                 </div>
 
@@ -297,7 +294,7 @@ const IssueDetails = () => {
                   <div className="absolute left-0 top-0 w-3 h-3 bg-blue-500 rounded-full border-4 border-white"></div>
                   <p className="text-sm text-gray-500">Approved</p>
                   <p className="font-medium text-gray-800">
-                    {formatDate(issue.approvedAt)}
+                    {formatExactDate(issue?.approvedAt)}
                   </p>
                 </div>
 

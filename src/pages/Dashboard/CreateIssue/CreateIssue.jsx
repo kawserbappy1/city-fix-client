@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import axios from "axios";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "../../../hooks/useAuth";
 
 const CreateIssue = () => {
   const areas = useLoaderData();
@@ -93,8 +93,7 @@ const CreateIssue = () => {
                 Swal.fire({
                   position: "top-end",
                   icon: "success",
-                  title:
-                    "Your Issue Successfully Added. You will be notified when admin approve your post.",
+                  text: "Your Issue Successfully Added. You will be notified when admin approve your post.",
                   showConfirmButton: false,
                   timer: 2500,
                 });

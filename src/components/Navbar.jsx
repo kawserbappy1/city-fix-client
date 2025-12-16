@@ -84,13 +84,6 @@ const Navbar = () => {
         </div>
         {/* button area with profile dropdown */}
         <div className="hidden md:flex items-center gap-2">
-          <Link
-            to={"/create-issue"}
-            className="bg-accent px-4 py-2 text-white rounded-full hover:bg-accent/80 transition"
-          >
-            Create Issue
-          </Link>
-
           {user ? (
             <div className="relative" ref={dropdownRef}>
               {/* Profile Picture Button */}
@@ -346,15 +339,7 @@ const Navbar = () => {
           </li>
 
           {/* Create Issue Button - Always visible */}
-          <li className="w-full mt-4">
-            <Link
-              to={"/create-issue"}
-              onClick={() => setMenuOpen(false)}
-              className="block bg-accent text-white text-center py-3 px-4 rounded-lg hover:bg-accent/80 transition-colors"
-            >
-              Create Issue
-            </Link>
-          </li>
+          <li className="w-full mt-4"></li>
 
           {/* Login/Logout Section */}
           <li className="w-full mt-6">
