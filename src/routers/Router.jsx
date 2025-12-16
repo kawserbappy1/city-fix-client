@@ -17,6 +17,7 @@ import Overview from "../pages/Dashboard/Overview/Overview";
 import Users from "../pages/Dashboard/Users/Users";
 import AllIssues from "../pages/Dashboard/AllIssues/AllIssues";
 import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
+import IssueDetails from "../pages/IssueDetails/IssueDetails";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Blog></Blog>,
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "issue-details/:id",
+        element: (
+          <PrivateRoute>
+            <IssueDetails></IssueDetails>
           </PrivateRoute>
         ),
       },

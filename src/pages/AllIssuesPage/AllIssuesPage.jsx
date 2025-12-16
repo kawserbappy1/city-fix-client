@@ -9,6 +9,8 @@ import { LuMapPin } from "react-icons/lu";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import { formatRelativeTime } from "../../Utilities/formatDate";
+import { Link } from "react-router";
+import IssueCardSkeleton from "../../components/IssueCardSkeleton";
 
 const AllIssuesPage = () => {
   const axiosSecure = useAxiosSecure();
@@ -19,7 +21,87 @@ const AllIssuesPage = () => {
       return res.data;
     },
   });
-  console.log(issues);
+
+  // Show skeleton loader while loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-20">
+        {/* Banner Section */}
+        <div className="relative bg-gradient-to-r from-blue-600 to-purple-600">
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div className="relative h-48 md:h-56 flex items-center justify-center">
+            <div className="text-center text-white px-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
+                All Issues
+              </h1>
+              <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+                Browse through community-reported issues and contribute to
+                making our city better
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats and Filter Section Skeleton */}
+        <div className="container mx-auto px-4 -mt-8 relative z-10">
+          <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              {/* Total Issues Skeleton */}
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <FiAlertCircle className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <div className="h-7 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <p className="text-gray-600 mt-1">Total Issues Reported</p>
+                </div>
+              </div>
+
+              {/* Filters Skeleton */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="w-48 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="w-48 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="w-32 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content - Two Column Layout Skeleton */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Sidebar - Categories Skeleton */}
+            <div className="lg:w-1/4">
+              <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-3 p-3">
+                    <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                    <div className="flex-1">
+                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-1"></div>
+                      <div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    <div className="h-6 w-8 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Content - Issue Cards Skeleton Grid */}
+            <div className="lg:w-3/4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {/* Show 6 skeleton cards */}
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <IssueCardSkeleton key={index} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-20">
@@ -230,9 +312,12 @@ const AllIssuesPage = () => {
                         </button>
 
                         {/* View Details */}
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                        <Link
+                          to={`/issue-details/${issue._id}`}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
                           View Details
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
