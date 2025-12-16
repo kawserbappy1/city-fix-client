@@ -12,43 +12,9 @@ import { BiUpvote } from "react-icons/bi";
 import { motion } from "framer-motion";
 
 const IssueCard = () => {
-  const priority = "high"; // Can be "low", "medium", "high", "critical"
-
-  const priorityColors = {
-    low: {
-      bg: "bg-base-100",
-      badge: "badge-info",
-      text: "text-info",
-      progress: "from-info to-info-focus",
-    },
-    medium: {
-      bg: "bg-base-100",
-      badge: "badge-warning",
-      text: "text-warning",
-      progress: "from-warning to-warning-focus",
-    },
-    high: {
-      bg: "bg-base-100",
-      badge: "badge-error",
-      text: "text-error",
-      progress: "from-error to-error-focus",
-    },
-    critical: {
-      bg: "bg-error/5",
-      badge: "badge-error",
-      text: "text-error",
-      progress: "from-error to-error-focus",
-      border: "border-error/20",
-    },
-  };
-
-  const currentPriority = priorityColors[priority];
-
   return (
     <motion.div
-      className={`card ${currentPriority.bg} border ${
-        currentPriority.border || "border-base-300"
-      } shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden rounded-xl`}
+      className={`card  border shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden rounded-xl`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ y: -3 }}
@@ -65,11 +31,8 @@ const IssueCard = () => {
 
         {/* Priority Badge */}
         <div className="absolute top-3 left-3 z-20">
-          <div
-            className={`badge ${currentPriority.badge} badge-sm font-bold gap-1`}
-          >
+          <div className={`badge badge-sm font-bold gap-1`}>
             <FaExclamationTriangle className="text-xs" />
-            {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
           </div>
         </div>
       </figure>
@@ -122,13 +85,11 @@ const IssueCard = () => {
         <div>
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs text-base-content">Progress</span>
-            <span className={`text-xs font-bold ${currentPriority.text}`}>
-              65%
-            </span>
+            <span className={`text-xs font-bold `}>65%</span>
           </div>
           <div className="w-full bg-base-300 rounded-full h-1">
             <motion.div
-              className={`bg-gradient-to-r ${currentPriority.progress} h-1 rounded-full`}
+              className={`bg-gradient-to-r  h-1 rounded-full`}
               initial={{ width: 0 }}
               whileInView={{ width: "65%" }}
               transition={{ duration: 1 }}

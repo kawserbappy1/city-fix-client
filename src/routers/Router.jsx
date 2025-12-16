@@ -16,6 +16,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Overview from "../pages/Dashboard/Overview/Overview";
 import Users from "../pages/Dashboard/Users/Users";
 import AllIssues from "../pages/Dashboard/AllIssues/AllIssues";
+import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home></Home>,
+      },
+      {
+        path: "all-issues",
+        element: <AllIssuesPage></AllIssuesPage>,
       },
       {
         path: "blog",

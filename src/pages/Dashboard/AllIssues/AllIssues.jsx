@@ -6,6 +6,7 @@ import {
 } from "../../../Utilities/formatDate";
 import { useState } from "react";
 import { FiEye, FiTrash2, FiX, FiInfo, FiUser, FiCheck } from "react-icons/fi";
+import { FcApproval } from "react-icons/fc";
 import Loader from "../../../components/Loader";
 import Swal from "sweetalert2";
 
@@ -93,11 +94,7 @@ const AllIssues = () => {
   const handleAssignToPerson = (assignee) => {
     // Here you would make an API call to assign the issue
     console.log(`Assigning issue ${issueToAssign?._id} to ${assignee.name}`);
-
-    // Show success message
     alert(`Issue assigned to ${assignee.name} successfully!`);
-
-    // Close modal and refresh data
     setIsAssignModalOpen(false);
     setIssueToAssign(null);
     refetch();
@@ -151,6 +148,19 @@ const AllIssues = () => {
       }
     });
   };
+  const approveMutation = useMutation({
+    mutationFn: (id) => axiosSecure.patch(`/issues/approve/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["issues"] });
+
+      Swal.fire({
+        icon: "success",
+        title: "Approved!",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    },
+  });
 
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
@@ -178,13 +188,6 @@ const AllIssues = () => {
         return "badge-neutral";
     }
   };
-
-  // Sample issue images for demo
-  const sampleImages = [
-    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w-500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1542744173-05336fcc7ad4?w=500&auto=format&fit=crop",
-  ];
 
   if (isLoading) {
     return <Loader></Loader>;
@@ -314,6 +317,26 @@ const AllIssues = () => {
                           <FiEye className="text-sm" />
                           <span className="hidden sm:inline ml-1">View</span>
                         </button>
+                        {issue.status === "pending" ? (
+                          <button
+                            onClick={() => approveMutation.mutate(issue._id)}
+                            className="btn btn-xs btn-outline btn-success"
+                            title="Approve"
+                          >
+                            <FcApproval className="text-sm" />
+                            <span className="hidden sm:inline ml-1">
+                              Approve
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="btn btn-xs btn-success cursor-not-allowed"
+                            title="Approved"
+                          >
+                            Approved
+                          </button>
+                        )}
                         <button
                           onClick={() => handleAssignClick(issue)}
                           className="btn btn-xs btn-outline btn-primary"

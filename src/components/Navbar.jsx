@@ -58,7 +58,7 @@ const Navbar = () => {
         <NavLink to="/">Home</NavLink>
       </li>
       <li className="link-hover">
-        <NavLink to="/dflkdj">All Issues</NavLink>
+        <NavLink to="/all-issues">All Issues</NavLink>
       </li>
       <li className="link-hover">
         <NavLink to="/blog">Blog</NavLink>
@@ -320,7 +320,7 @@ const Navbar = () => {
           <li className="w-full">
             <NavLink
               onClick={() => setMenuOpen(false)}
-              to={"/dsfds"}
+              to={"/all-issues"}
               className="block py-3 px-4 hover:bg-white/10 rounded-lg transition-colors"
             >
               All Issues
