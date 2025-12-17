@@ -10,10 +10,12 @@ import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { SignInUser, signUpWithGoogle } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -24,9 +26,19 @@ const LoginForm = () => {
   } = useForm();
 
   const handlesignupform = (data) => {
-    console.log(data);
     SignInUser(data.email, data.password)
       .then((result) => {
+        const userInfo = {
+          email: result?.user?.email,
+          displayName: result?.user?.displayName,
+          photoURL: result?.user?.photoURL,
+        };
+        axiosSecure
+          .post("/user", userInfo)
+          .then(() => {})
+          .catch((err) => {
+            console.log(err);
+          });
         toast.success("Login succefully");
         navigate(location.state?.from?.pathname || "/", {
           replace: true,
@@ -47,10 +59,22 @@ const LoginForm = () => {
   const handleGoogleSignUp = () => {
     signUpWithGoogle()
       .then((result) => {
-        toast.success("sign up successfully");
+        const userInfo = {
+          email: result?.user?.email,
+          displayName: result?.user?.displayName,
+          photoURL: result?.user?.photoURL,
+        };
         navigate(location.state?.from?.pathname || "/", {
           replace: true,
         });
+        axiosSecure
+          .post("/user", userInfo)
+          .then(() => {})
+          .catch((err) => {
+            console.log(err);
+          });
+
+        toast.success("sign up successfully");
       })
       .catch((error) => {
         console.log(error);

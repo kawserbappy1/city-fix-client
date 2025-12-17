@@ -6,12 +6,13 @@ import {
   FiUsers,
   FiSettings,
   FiMenu,
-  FiX,
   FiSearch,
   FiBell,
   FiLogOut,
 } from "react-icons/fi";
 import { FaBoxTissue, FaPencilRuler, FaRegEdit } from "react-icons/fa";
+import { RiEditBoxLine } from "react-icons/ri";
+import { GiPayMoney } from "react-icons/gi";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -88,7 +89,7 @@ const DashboardLayout = () => {
         </nav>
 
         {/* Bottom Action */}
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-100">
+        <div className="absolute bottom-0 w-full p-4 border-t border-gray-100 ">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-12 h-12">
               <img
@@ -104,9 +105,19 @@ const DashboardLayout = () => {
           <div className="my-2">
             <Link
               to={"/"}
-              className="text-success underline underline-offset-6 font-bold"
+              className="text-success text-sm flex items-center gap-2"
             >
+              <GiPayMoney />
               Upgrade you plan
+            </Link>{" "}
+          </div>
+          <div className="my-2">
+            <Link
+              to={"/dashboard/view-edit"}
+              className="text-success text-sm flex items-center gap-2"
+            >
+              <RiEditBoxLine />
+              View & edit Profile
             </Link>{" "}
           </div>
           <button className="flex items-center justify-center px-4 py-2 text-red-500 transition-colors rounded-lg hover:bg-red-50">

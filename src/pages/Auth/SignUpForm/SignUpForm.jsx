@@ -14,13 +14,16 @@ import useAuth from "../../../hooks/useAuth";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 import axios from "axios";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const { signUpNewUser, signUpWithGoogle, updateUserProfile } = useAuth();
-  const location = useLocation();
+  const axiosSecure = useAxiosSecure();
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -36,63 +39,75 @@ const SignUpForm = () => {
     defaultValue: "",
   });
 
-  const handlesignupform = (data) => {
-    const profileImage = data.photo[0];
-    signUpNewUser(data.email, data.password)
-      .then((result) => {
-        const formData = new FormData();
-        formData.append("image", profileImage);
-        axios
-          .post(
-            `https://api.imgbb.com/1/upload?key=${
-              import.meta.env.VITE_IMAGE_HOST
-            }`,
-            formData
-          )
-          .then((res) => {
-            const photoURL = res.data.data.url;
-            const userProfile = {
-              displayName: data.name,
-              photoURL: photoURL,
-            };
-            updateUserProfile(userProfile)
-              .then(() => {
-                navigate(location.state?.from?.pathname || "/", {
-                  replace: true,
-                });
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-            reset();
-            toast.success("sign up successfully");
-            // const userInfo = {
-            //   email: data.email,
-            //   displayName: data.name,
-            //   photoURL: photoURL,
-            // };
-          });
-      })
-      .catch((err) => {
-        if (err?.code === "auth/email-already-in-use") {
-          toast.error("Email already exists. Try another one!");
-          return;
-        }
-      });
+  const handlesignupform = async (data) => {
+    try {
+      const profileImage = data.photo[0];
+      await signUpNewUser(data.email, data.password);
+      const formData = new FormData();
+      formData.append("image", profileImage);
+      const res = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOST}`,
+        formData
+      );
+      const photoURL = res.data.data.url;
+      const userProfile = {
+        displayName: data.name,
+        photoURL: photoURL,
+      };
+
+      await updateUserProfile(userProfile);
+      const userInfo = {
+        email: data.email,
+        displayName: data.name,
+        photoURL: photoURL,
+      };
+
+      axiosSecure
+        .post("/user", userInfo)
+        .then(() => {})
+        .catch((err) => {
+          console.log(err);
+        });
+
+      toast.success("Sign up successful");
+
+      reset();
+      navigate(location.state?.from?.pathname || "/", { replace: true });
+    } catch (err) {
+      if (err?.code === "auth/email-already-in-use") {
+        toast.error("Email already exists. Try another one!");
+      } else {
+        console.error(err);
+        toast.error("Signup failed");
+      }
+    }
   };
 
   const handleGoogleSignUp = () => {
     signUpWithGoogle()
       .then((result) => {
+        const userInfo = {
+          email: result?.user?.email,
+          displayName: result?.user?.displayName,
+          photoURL: result?.user?.photoURL,
+        };
         navigate(location.state?.from?.pathname || "/", {
           replace: true,
         });
+        axiosSecure
+          .post("/user", userInfo)
+          .then(() => {})
+          .catch((err) => {
+            console.log(err);
+          });
+
         toast.success("sign up successfully");
       })
       .catch((error) => {
         console.log(error);
       });
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-50 to-emerald-50 p-4 pt-20">
       {/* Background Elements */}

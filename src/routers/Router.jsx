@@ -19,6 +19,7 @@ import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
 import MyIssues from "../pages/Dashboard/MyIssues/MyIssues";
 import CreateIssue from "../pages/Dashboard/CreateIssue/CreateIssue";
+import EditProfile from "../pages/Auth/Profile/EditProfile";
 
 const router = createBrowserRouter([
   {
@@ -113,6 +114,10 @@ const router = createBrowserRouter([
         path: "create-issue",
         element: <CreateIssue></CreateIssue>,
         loader: () => fetch("/area.json").then((res) => res.json()),
+      },
+      {
+        path: "view-edit",
+        element: <EditProfile></EditProfile>,
       },
     ],
   },

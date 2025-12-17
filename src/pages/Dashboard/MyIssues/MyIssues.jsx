@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FiEye,
   FiEdit2,
@@ -8,6 +8,11 @@ import {
   FiXCircle,
   FiAlertCircle,
   FiFilter,
+  FiMapPin,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiThumbsUp,
 } from "react-icons/fi";
 import { MdOutlinePendingActions } from "react-icons/md";
 import useAuth from "../../../hooks/useAuth";
@@ -31,7 +36,10 @@ const MyIssues = () => {
       return res.data;
     },
   });
-  console.log(issues);
+
+  const pendingIssue = issues.filter((issue) => issue.status === "pending");
+  const approvalIssue = issues.filter((issue) => issue.status === "approved");
+  const resolvedIssue = issues.filter((issue) => issue.status === "resolved");
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -123,7 +131,9 @@ const MyIssues = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Issues</p>
-                <p className="text-2xl font-bold text-gray-800">12</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {issues.length}
+                </p>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg">
                 <FiAlertCircle className="w-6 h-6 text-blue-600" />
@@ -135,7 +145,9 @@ const MyIssues = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">8</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {pendingIssue.length}
+                </p>
               </div>
               <div className="p-3 bg-yellow-50 rounded-lg">
                 <MdOutlinePendingActions className="w-6 h-6 text-yellow-600" />
@@ -147,7 +159,9 @@ const MyIssues = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Approved</p>
-                <p className="text-2xl font-bold text-green-600">3</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {approvalIssue.length}
+                </p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg">
                 <FiCheckCircle className="w-6 h-6 text-green-600" />
@@ -159,7 +173,9 @@ const MyIssues = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Resolved</p>
-                <p className="text-2xl font-bold text-purple-600">1</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {resolvedIssue.length}
+                </p>
               </div>
               <div className="p-3 bg-purple-50 rounded-lg">
                 <FiCheckCircle className="w-6 h-6 text-purple-600" />
@@ -336,147 +352,278 @@ const MyIssues = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Issue Details
-                </h2>
-                <button
-                  onClick={() => setViewModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                  <FiXCircle className="w-5 h-5 text-gray-500" />
-                </button>
+              {/* Modal Header with Image */}
+              <div className="flex flex-col lg:flex-row gap-6 mb-8">
+                <div className="lg:w-2/3">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                        Issue Details
+                      </h2>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                            selectedIssue.status === "approved"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                          }`}
+                        >
+                          {selectedIssue.status.charAt(0).toUpperCase() +
+                            selectedIssue.status.slice(1)}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            selectedIssue.priority === "High"
+                              ? "bg-red-100 text-red-700"
+                              : selectedIssue.priority === "Medium"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {selectedIssue.priority} Priority
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setViewModalOpen(false)}
+                      className="p-2 hover:bg-gray-100 rounded-full"
+                    >
+                      <FiXCircle className="w-5 h-5 text-gray-500" />
+                    </button>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">
+                    {selectedIssue.issueName}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {selectedIssue.description}
+                  </p>
+                </div>
+
+                <div className="lg:w-1/3">
+                  <div className="aspect-video rounded-lg overflow-hidden border border-gray-200">
+                    <img
+                      src={selectedIssue.issueImageURL}
+                      alt={selectedIssue.issueName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Main Content Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column - Issue Info */}
+                {/* Left Column - Issue Details */}
                 <div className="lg:col-span-2 space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      {selectedIssue.issueName}
-                    </h3>
-                    <p className="text-gray-600">{selectedIssue.description}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Category</p>
-                      <p className="font-medium text-gray-800">
-                        {selectedIssue.category}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 mb-1">Priority</p>
-                      <p
-                        className={`font-medium ${
-                          selectedIssue.priority === "High"
-                            ? "text-red-600"
-                            : "text-yellow-600"
-                        }`}
-                      >
-                        {selectedIssue.priority}
-                      </p>
+                  {/* Category & Basic Info */}
+                  <div className="bg-gray-50 rounded-xl p-5">
+                    <h4 className="font-semibold text-gray-800 mb-4">
+                      Issue Information
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-2">Category</p>
+                        <div className="px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium">
+                          {selectedIssue.category}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-2">Division</p>
+                        <p className="font-medium text-gray-800">
+                          {selectedIssue.division}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-3">
+                  {/* Location Details */}
+                  <div className="bg-gray-50 rounded-xl p-5">
+                    <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <FiMapPin className="text-blue-500" />
                       Location Details
                     </h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                       <div>
-                        <p className="text-sm text-gray-500">District</p>
+                        <p className="text-sm text-gray-500 mb-1">Division</p>
+                        <p className="font-medium text-gray-800">
+                          {selectedIssue.division}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">District</p>
                         <p className="font-medium text-gray-800">
                           {selectedIssue.district}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Upazila</p>
+                        <p className="text-sm text-gray-500 mb-1">Upazila</p>
                         <p className="font-medium text-gray-800">
                           {selectedIssue.upazila}
                         </p>
                       </div>
                     </div>
-                    <div className="mt-3">
-                      <p className="text-sm text-gray-500">Address</p>
-                      <p className="font-medium text-gray-800">
-                        {selectedIssue.address}
-                      </p>
+                    {selectedIssue.address && (
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">
+                          Complete Address
+                        </p>
+                        <p className="font-medium text-gray-800 whitespace-pre-line">
+                          {selectedIssue.address}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="bg-gray-50 rounded-xl p-5">
+                    <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <FiClock className="text-blue-500" />
+                      Timeline
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500">Reported On</p>
+                          <p className="font-medium text-gray-800">
+                            {selectedIssue.createdAt
+                              ? formatExactDate(selectedIssue.createdAt)
+                              : "N/A"}
+                          </p>
+                        </div>
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500">Approved On</p>
+                          <p className="font-medium text-gray-800">
+                            {selectedIssue.approvedAt
+                              ? formatExactDate(selectedIssue.approvedAt)
+                              : "Not approved yet"}
+                          </p>
+                        </div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Column - Status & Posted Info */}
+                {/* Right Column - Contact & Actions */}
                 <div className="space-y-6">
-                  <div className="bg-white border border-gray-200 rounded-lg p-5">
-                    <h4 className="font-semibold text-gray-800 mb-4">
-                      Status Information
+                  {/* Posted By Card */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-5">
+                    <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <FiUser className="text-blue-500" />
+                      Posted By
                     </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm text-gray-500">Current Status</p>
-                        <span
-                          className={`mt-1 inline-block px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(
-                            selectedIssue.status
-                          )}`}
-                        >
-                          {selectedIssue.status}
+
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold">
+                          {selectedIssue.postedBy
+                            ?.split(" ")
+                            .map((n) => n[0])
+                            .join("") || "U"}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Workflow Stage</p>
-                        <span
-                          className={`mt-1 inline-block px-3 py-1 rounded-full text-sm font-medium ${getWorkflowColor(
-                            selectedIssue.workflow
-                          )}`}
-                        >
-                          {selectedIssue.workflow}
-                        </span>
+                        <h5 className="font-bold text-gray-800">
+                          {selectedIssue.postedBy}
+                        </h5>
+                        <p className="text-sm text-gray-500">Issue Reporter</p>
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Reported On</p>
-                        <p className="font-medium text-gray-800 mt-1">
-                          {formatExactDate(selectedIssue.createdAt)}
-                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                          <FiMail className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Email</p>
+                          <p className="font-medium text-gray-800 truncate">
+                            {selectedIssue.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                          <FiPhone className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Phone</p>
+                          <p className="font-medium text-gray-800">
+                            {selectedIssue.phoneNumber}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-lg p-5">
+                  {/* Quick Actions */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h4 className="font-semibold text-gray-800 mb-4">
-                      Posted By
+                      Quick Actions
                     </h4>
                     <div className="space-y-3">
-                      <div>
-                        <p className="text-sm text-gray-500">Name</p>
-                        <p className="font-medium text-gray-800">
-                          {selectedIssue.postedBy}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p className="font-medium text-gray-800">
-                          {selectedIssue.email}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p className="font-medium text-gray-800">
-                          {selectedIssue.phoneNumber}
-                        </p>
+                      <button className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                        <FiThumbsUp className="w-4 h-4" />
+                        Upvote Issue
+                      </button>
+                      <button className="w-full py-2.5 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+                        Share Issue
+                      </button>
+                      {selectedIssue.status === "approved" && (
+                        <button className="w-full py-2.5 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors font-medium">
+                          View Progress
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Stats */}
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                      <div className="flex items-center justify-around">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-gray-800">
+                            156
+                          </p>
+                          <p className="text-xs text-gray-500">Upvotes</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-gray-800">24</p>
+                          <p className="text-xs text-gray-500">Comments</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-gray-800">3</p>
+                          <p className="text-xs text-gray-500">Shares</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
-                <button
-                  onClick={() => setViewModalOpen(false)}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
-                >
-                  Close
-                </button>
+              {/* Modal Footer */}
+              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                <div className="text-sm text-gray-600">
+                  Issue ID:{" "}
+                  <code className="bg-gray-100 px-2 py-1 rounded text-xs">
+                    {selectedIssue._id?.slice(-8) || "N/A"}
+                  </code>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setViewModalOpen(false)}
+                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                  >
+                    Close
+                  </button>
+                  {selectedIssue.status !== "approved" && (
+                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                      Edit Issue
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -486,10 +633,18 @@ const MyIssues = () => {
       {/* Edit Modal - Basic Structure */}
       {editModalOpen && selectedIssue && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-2xl">
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Edit Issue</h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Edit Issue
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Update your issue details. Fields marked with * are
+                    required.
+                  </p>
+                </div>
                 <button
                   onClick={() => setEditModalOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-full"
@@ -498,67 +653,294 @@ const MyIssues = () => {
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {/* Form fields would go here */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Issue Name
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue={selectedIssue.issueName}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column - Basic Information */}
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-3">
+                      Basic Information
+                    </h3>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    defaultValue={selectedIssue.description}
-                    rows="4"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Issue Name *
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue={selectedIssue.issueName}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter issue title"
+                        />
+                      </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Priority
-                    </label>
-                    <select
-                      defaultValue={selectedIssue.priority}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="High">High</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Low">Low</option>
-                    </select>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Category *
+                        </label>
+                        <select
+                          defaultValue={selectedIssue.category}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select Category</option>
+                          <option value="Road or Potholes">
+                            Road or Potholes
+                          </option>
+                          <option value="Sanitation">Sanitation</option>
+                          <option value="Water Supply">Water Supply</option>
+                          <option value="Electricity">Electricity</option>
+                          <option value="Public Safety">Public Safety</option>
+                          <option value="Parks & Green Spaces">
+                            Parks & Green Spaces
+                          </option>
+                          <option value="Infrastructure">Infrastructure</option>
+                          <option value="Healthcare">Healthcare</option>
+                          <option value="Education">Education</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Priority *
+                        </label>
+                        <select
+                          defaultValue={selectedIssue.priority}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="High">High</option>
+                          <option value="Medium">Medium</option>
+                          <option value="Low">Low</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Issue Image URL
+                        </label>
+                        <input
+                          type="url"
+                          defaultValue={selectedIssue.issueImageURL}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="https://example.com/image.jpg"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Enter a direct image URL
+                        </p>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Location Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <FiMapPin className="text-blue-500" />
+                      Location Information
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Division *
+                        </label>
+                        <select
+                          defaultValue={selectedIssue.division}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select Division</option>
+                          <option value="Dhaka">Dhaka</option>
+                          <option value="Chattogram">Chattogram</option>
+                          <option value="Rajshahi">Rajshahi</option>
+                          <option value="Khulna">Khulna</option>
+                          <option value="Barishal">Barishal</option>
+                          <option value="Sylhet">Sylhet</option>
+                          <option value="Rangpur">Rangpur</option>
+                          <option value="Mymensingh">Mymensingh</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            District *
+                          </label>
+                          <input
+                            type="text"
+                            defaultValue={selectedIssue.district}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter district"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Upazila *
+                          </label>
+                          <input
+                            type="text"
+                            defaultValue={selectedIssue.upazila}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter upazila"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Complete Address
+                        </label>
+                        <textarea
+                          defaultValue={selectedIssue.address}
+                          rows="3"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter full address with details"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Description & Contact */}
+                <div className="space-y-4">
+                  {/* Description */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-3">
+                      Description *
+                    </h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Detailed Description
+                      </label>
+                      <textarea
+                        defaultValue={selectedIssue.description}
+                        rows="8"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Provide detailed description of the issue..."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Include specific details, impact, and any relevant
+                        information
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <FiUser className="text-blue-500" />
+                      Contact Information
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Name *
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue={selectedIssue.postedBy}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          defaultValue={selectedIssue.email}
+                          readOnly
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your email"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          defaultValue={selectedIssue.phoneNumber}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter phone number"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image Preview */}
+                  {selectedIssue.issueImageURL && (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-800 mb-3">
+                        Image Preview
+                      </h3>
+                      <div className="aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+                        <img
+                          src={selectedIssue.issueImageURL}
+                          alt="Current issue image"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E";
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Current uploaded image
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Form Validation & Status */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="flex items-start gap-3">
+                  <FiAlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={selectedIssue.category}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <p className="text-sm text-blue-800 font-medium">
+                      Note: Once an issue is approved, it cannot be edited.
+                    </p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Current Status:{" "}
+                      <span
+                        className={`font-semibold ${
+                          selectedIssue.status === "approved"
+                            ? "text-green-600"
+                            : "text-yellow-600"
+                        }`}
+                      >
+                        {selectedIssue.status.charAt(0).toUpperCase() +
+                          selectedIssue.status.slice(1)}
+                      </span>
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end gap-3">
-                <button
-                  onClick={() => setEditModalOpen(false)}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
-                >
-                  Cancel
-                </button>
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                  Save Changes
-                </button>
+              {/* Modal Footer */}
+              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                <div className="text-sm text-gray-600">
+                  Issue ID:{" "}
+                  <code className="bg-gray-100 px-2 py-1 rounded text-xs">
+                    {selectedIssue._id?.slice(-8) || "N/A"}
+                  </code>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEditModalOpen(false)}
+                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2">
+                    <FiEdit2 className="w-4 h-4" />
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
