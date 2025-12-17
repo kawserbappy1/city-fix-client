@@ -21,6 +21,7 @@ import MyIssues from "../pages/Dashboard/MyIssues/MyIssues";
 import CreateIssue from "../pages/Dashboard/CreateIssue/CreateIssue";
 import EditProfile from "../pages/Auth/Profile/EditProfile";
 import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
+import BeStaff from "../pages/BeStaff/BeStaff";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,11 @@ const router = createBrowserRouter([
       {
         path: "careers",
         element: <Careers></Careers>,
+      },
+      {
+        path: "be-staff",
+        element: <BeStaff></BeStaff>,
+        loader: () => fetch(`/area.json`).then((res) => res.json()),
       },
     ],
   },

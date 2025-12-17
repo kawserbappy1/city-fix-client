@@ -66,6 +66,11 @@ const Navbar = () => {
       <li className="link-hover">
         <NavLink to="/contact">Contact</NavLink>
       </li>
+      {user && (
+        <li className="link-hover">
+          <NavLink to="/be-staff">Be Staff</NavLink>
+        </li>
+      )}
     </>
   );
 
