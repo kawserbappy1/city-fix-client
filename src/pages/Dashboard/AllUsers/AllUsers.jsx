@@ -146,7 +146,7 @@ const AllUsers = () => {
         <div className="flex-1 bg-white rounded-xl p-4 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Staff</p>
+              <p className="text-sm text-gray-600">taff</p>
               <p className="text-2xl font-bold text-green-600">
                 {staffUsers.length}
               </p>

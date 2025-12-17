@@ -11,7 +11,7 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { FaBoxTissue, FaPencilRuler, FaRegEdit } from "react-icons/fa";
-import { RiEditBoxLine } from "react-icons/ri";
+import { RiEditBoxLine, RiUserCommunityLine } from "react-icons/ri";
 import { GiPayMoney } from "react-icons/gi";
 
 const DashboardLayout = () => {
@@ -41,6 +41,11 @@ const DashboardLayout = () => {
       end: true,
     },
     { path: "/dashboard/all-users", label: "All Users", icon: <FiUsers /> },
+    {
+      path: "/dashboard/all-staff",
+      label: "All Staff",
+      icon: <RiUserCommunityLine />,
+    },
     { path: "/dashboard/settings", label: "Settings", icon: <FiSettings /> },
   ];
 

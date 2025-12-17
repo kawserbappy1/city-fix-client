@@ -2,10 +2,15 @@ import React from "react";
 import useAuth from "./../../hooks/useAuth";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
 
 const BeStaff = () => {
   const { user } = useAuth();
   const areas = useLoaderData();
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -65,8 +70,54 @@ const BeStaff = () => {
     "Traffic & Signals",
   ];
 
+  const addStaffMutation = useMutation({
+    mutationFn: (staffData) => axiosSecure.post("/staff", staffData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staffData"] });
+
+      Swal.fire({
+        icon: "success",
+        title: "Application Submitted",
+        text: "Staff application is pending approval. we will notify when admin approve your application",
+      });
+    },
+
+    onError: (error) => {
+      if (error.response?.status === 409) {
+        Swal.fire({
+          icon: "warning",
+          title: "Already Applied",
+          text: "Staff already exists with this email.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to submit application.",
+        });
+      }
+    },
+  });
+
   const handlestaffregistration = (data) => {
     console.log(data);
+    const staffData = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      division: data.division,
+      district: data.district,
+      upazila: data.upazila,
+      category: data.category,
+      availability: data.availability,
+      experience: data.experience,
+      certificate: data.certificate,
+      education: data.education,
+      nid: data.nid,
+      staffPhoto: user.photoURL,
+    };
+    addStaffMutation.mutate(staffData);
+    reset();
   };
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-20 px-4">
@@ -297,6 +348,7 @@ const BeStaff = () => {
                   </label>
                   <input
                     type="number"
+                    {...register("experience")}
                     placeholder="e.g., 5"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -309,6 +361,7 @@ const BeStaff = () => {
                   </label>
                   <input
                     type="text"
+                    {...register("nid")}
                     placeholder="Enter NID number"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -322,6 +375,7 @@ const BeStaff = () => {
                 </label>
                 <input
                   type="text"
+                  {...register("education")}
                   placeholder="e.g., BSc in Civil Engineering"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -334,6 +388,7 @@ const BeStaff = () => {
                 </label>
                 <input
                   type="text"
+                  {...register("certificate")}
                   placeholder="e.g., PMP, PEng, etc."
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
