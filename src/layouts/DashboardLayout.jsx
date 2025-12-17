@@ -40,7 +40,7 @@ const DashboardLayout = () => {
       icon: <FaBoxTissue />,
       end: true,
     },
-    { path: "/dashboard/users", label: "All Users", icon: <FiUsers /> },
+    { path: "/dashboard/all-users", label: "All Users", icon: <FiUsers /> },
     { path: "/dashboard/settings", label: "Settings", icon: <FiSettings /> },
   ];
 
@@ -103,10 +103,7 @@ const DashboardLayout = () => {
             </div>
           </div>
           <div className="my-2">
-            <Link
-              to={"/"}
-              className="text-success text-sm flex items-center gap-2"
-            >
+            <Link to={"/"} className=" text-sm flex items-center gap-2">
               <GiPayMoney />
               Upgrade you plan
             </Link>{" "}
@@ -114,7 +111,7 @@ const DashboardLayout = () => {
           <div className="my-2">
             <Link
               to={"/dashboard/view-edit"}
-              className="text-success text-sm flex items-center gap-2"
+              className="text-sm flex items-center gap-2"
             >
               <RiEditBoxLine />
               View & edit Profile

@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 import { imageUpload } from "../../../Utilities/Utilities";
 
 const EditProfile = () => {
-  const { user, updateUserProfile } = useAuth(); // ✅ This now expects an object
+  const { user, updateUserProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -81,14 +81,10 @@ const EditProfile = () => {
     setImageFile(null);
   };
 
-  // ✅ FIXED: Now passes an object to updateUserProfile
   const handleEditUserProfile = async (data) => {
     setIsUpdating(true);
-
     try {
       let photoURL = user.photoURL;
-
-      // Upload new image if provided
       if (imageFile) {
         try {
           const uploadedImageURL = await imageUpload(imageFile);
@@ -102,32 +98,22 @@ const EditProfile = () => {
           });
         }
       }
-
-      // ✅ CORRECT: Pass an object to updateUserProfile
       const profileUpdates = {
         displayName: data.name,
         photoURL: photoURL,
       };
 
-      // Update Firebase Authentication profile
       await updateUserProfile(profileUpdates);
-
-      // Also update in your database (optional)
       try {
         const userData = {
           displayName: data.name,
           photoURL: photoURL,
-          email: user.email,
-          updatedAt: new Date().toISOString(),
         };
-
-        await axiosSecure.put(`/users/${user.email}`, userData);
+        await axiosSecure.patch(`/users/${user.email}`, userData);
       } catch (dbError) {
         console.error("Database update failed:", dbError);
-        // Continue even if DB update fails
       }
 
-      // Show success
       Swal.fire({
         position: "top-end",
         icon: "success",

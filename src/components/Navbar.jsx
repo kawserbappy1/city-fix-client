@@ -158,7 +158,7 @@ const Navbar = () => {
                     </Link>
 
                     <Link
-                      to="/profile"
+                      to="/dashboard/view-edit"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     >

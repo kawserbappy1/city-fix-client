@@ -20,6 +20,7 @@ import IssueDetails from "../pages/IssueDetails/IssueDetails";
 import MyIssues from "../pages/Dashboard/MyIssues/MyIssues";
 import CreateIssue from "../pages/Dashboard/CreateIssue/CreateIssue";
 import EditProfile from "../pages/Auth/Profile/EditProfile";
+import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
 
 const router = createBrowserRouter([
   {
@@ -118,6 +119,10 @@ const router = createBrowserRouter([
       {
         path: "view-edit",
         element: <EditProfile></EditProfile>,
+      },
+      {
+        path: "all-users",
+        element: <AllUsers></AllUsers>,
       },
     ],
   },
