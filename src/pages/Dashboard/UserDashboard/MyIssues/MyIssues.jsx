@@ -14,19 +14,19 @@ import {
   FiPhone,
 } from "react-icons/fi";
 import { MdOutlinePendingActions } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAuth from "../../../../hooks/useAuth";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import { formatExactDate } from "../../../../Utilities/formatDate";
 import { Link } from "react-router";
+import Swal from "sweetalert2";
 
 const MyIssues = () => {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-
+  const queryClient = useQueryClient();
   const { data: issues = [] } = useQuery({
     queryKey: ["my-issues", user.email],
     queryFn: async () => {
@@ -34,7 +34,6 @@ const MyIssues = () => {
       return res.data;
     },
   });
-
   const pendingIssue = issues.filter((issue) => issue.status === "pending");
   const approvalIssue = issues.filter((issue) => issue.status === "approved");
   const resolvedIssue = issues.filter((issue) => issue.status === "resolved");
@@ -89,10 +88,40 @@ const MyIssues = () => {
     }
   };
 
-  const handleDelete = (issue) => {
-    if (issue.status !== "Approved") {
-      setSelectedIssue(issue);
-    }
+  const deleteIssueMutation = useMutation({
+    mutationFn: (id) => axiosSecure.delete(`/issue-delete/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-issues"] });
+      Swal.fire({
+        title: "Deleted!",
+        text: "Issue has been deleted successfully.",
+        icon: "success",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete issue.",
+        icon: "error",
+      });
+    },
+  });
+
+  const handleDeleteIssue = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteIssueMutation.mutate(id);
+      }
+    });
   };
 
   return (
@@ -316,7 +345,7 @@ const MyIssues = () => {
 
                       {/* Delete Button - Disabled for Approved issues */}
                       <button
-                        onClick={() => handleDelete(issue)}
+                        onClick={() => handleDeleteIssue(issue._id)}
                         disabled={issue?.status === "approved"}
                         className={`p-2 rounded-lg transition-colors ${
                           issue?.status === "approved"

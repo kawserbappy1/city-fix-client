@@ -13,7 +13,6 @@ import SignUpForm from "../pages/Auth/SignUpForm/SignUpForm";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Overview from "../pages/Dashboard/Overview/Overview";
-import Users from "../pages/Dashboard/Users/Users";
 import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
 import EditProfile from "../pages/Auth/Profile/EditProfile";
@@ -25,6 +24,7 @@ import CreateIssue from "../pages/Dashboard/UserDashboard/CreateIssue/CreateIssu
 import MyIssues from "../pages/Dashboard/UserDashboard/MyIssues/MyIssues";
 import StaffProfile from "../pages/Dashboard/StaffDashboard/StaffProfile/StaffProfile";
 import EditIssue from "../pages/Dashboard/UserDashboard/EditIssue/EditIssue";
+import AssignedIssue from "../pages/Dashboard/StaffDashboard/AssignedIssu/AssignedIssu";
 
 const router = createBrowserRouter([
   {
@@ -108,10 +108,7 @@ const router = createBrowserRouter([
         index: true,
         element: <Overview></Overview>,
       },
-      {
-        path: "users",
-        element: <Users />,
-      },
+
       {
         path: "all-issues",
         element: <AllIssues></AllIssues>,
@@ -145,6 +142,10 @@ const router = createBrowserRouter([
       {
         path: "staff-profile",
         element: <StaffProfile></StaffProfile>,
+      },
+      {
+        path: "assign-issue",
+        element: <AssignedIssue></AssignedIssue>,
       },
     ],
   },

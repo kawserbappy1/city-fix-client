@@ -52,7 +52,7 @@ const staffMenu = [
     icon: <FaUserCog />,
   },
   {
-    path: "/dashboard/my-issues",
+    path: "/dashboard/assign-issue",
     label: "Assigned Issues",
     icon: <FaPencilRuler />,
   },
@@ -78,7 +78,6 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, logOut } = useAuth();
   const { role, isLoading } = useRole();
-  const { membership, isMemberShipLoading } = UseMembership();
 
   /* ===== Loading Role ===== */
   if (isLoading) {

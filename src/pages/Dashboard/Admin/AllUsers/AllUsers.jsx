@@ -14,11 +14,11 @@ const AllUsers = () => {
     },
   });
 
-  const freeUsers = allUsers.filter((user) => user.isPremium === "free");
+  const freeUsers = allUsers.filter((user) => user.membership === "free");
   const standardUsers = allUsers.filter(
-    (user) => user.isPremium === "standard"
+    (user) => user.membership === "standard"
   );
-  const premiumUsers = allUsers.filter((user) => user.isPremium === "premium");
+  const premiumUsers = allUsers.filter((user) => user.membership === "premium");
   const staffUsers = allUsers.filter((user) => user.role === "staff");
 
   const deleteUserMutation = useMutation({
@@ -253,7 +253,7 @@ const AllUsers = () => {
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
-                      {user.isPremium}
+                      {user.isPremium || user.membership}
                     </div>
                   </td>
                   <td className="py-4 px-4">

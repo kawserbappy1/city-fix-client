@@ -49,10 +49,8 @@ const AllIssues = () => {
       axiosSecure.patch(`/issues/assign/${issueId}`, {
         staffId,
       }),
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["issues"] });
-
       Swal.fire({
         icon: "success",
         title: "Assigned!",
@@ -60,11 +58,9 @@ const AllIssues = () => {
         timer: 1500,
         showConfirmButton: false,
       });
-
       setIsAssignModalOpen(false);
       setIssueToAssign(null);
     },
-
     onError: (error) => {
       console.error(error);
       Swal.fire({
@@ -107,17 +103,14 @@ const AllIssues = () => {
 
   const deleteIssueMutation = useMutation({
     mutationFn: (id) => axiosSecure.delete(`/issues/${id}`),
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["issues"] });
-
       Swal.fire({
         title: "Deleted!",
         text: "Issue has been deleted successfully.",
         icon: "success",
       });
     },
-
     onError: (error) => {
       console.error(error);
       Swal.fire({
@@ -143,6 +136,7 @@ const AllIssues = () => {
       }
     });
   };
+
   const approveMutation = useMutation({
     mutationFn: (id) => axiosSecure.patch(`/issues/approve/${id}`),
     onSuccess: () => {
@@ -156,6 +150,34 @@ const AllIssues = () => {
       });
     },
   });
+
+  const rejectMutation = useMutation({
+    mutationFn: (id) => axiosSecure.patch(`/issues/reject/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["issues"] });
+      Swal.fire({
+        title: "Rejected!",
+        text: "Issue has been rejected successfully.",
+        icon: "success",
+      });
+    },
+  });
+
+  const handleRejectedIssu = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        rejectMutation.mutate(id);
+      }
+    });
+  };
 
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
@@ -354,7 +376,7 @@ const AllIssues = () => {
                         </button>
 
                         <button
-                          onClick={() => handleDeleteIssue(issue._id)}
+                          onClick={() => handleRejectedIssu(issue._id)}
                           className="btn btn-xs btn-outline btn-error"
                           title="Reject Issue"
                         >

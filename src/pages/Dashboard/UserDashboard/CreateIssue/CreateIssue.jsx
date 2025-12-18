@@ -190,9 +190,9 @@ const CreateIssue = () => {
         </p>
 
         <p className="text-gray-600 mt-2">
-          You are {usage.membership} user. Your reaminig post
-          <span className="text-red-500 font-bold"> {usage.remaining} </span>
-          of <span className="font-bold"> {usage.limit}</span>
+          You are {usage?.membership} user. Your reaminig post
+          <span className="text-red-500 font-bold"> {usage?.remaining} </span>
+          of <span className="font-bold"> {usage?.limit}</span>
         </p>
       </div>
 
