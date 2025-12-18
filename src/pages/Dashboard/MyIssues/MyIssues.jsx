@@ -201,7 +201,7 @@ const MyIssues = () => {
                   Issue Name
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
-                  Time
+                  Assign to
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
                   Status
@@ -251,13 +251,29 @@ const MyIssues = () => {
                           {issue.category}
                         </span>
                       </div>
+                      <span className="text-sm text-gray-600">
+                        {formatExactDate(issue.createdAt)}
+                      </span>
                     </div>
                   </td>
-                  <td className="py-4 px-4">
+                  {/* <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
                       <FiClock className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">
                         {formatExactDate(issue.createdAt)}
+                      </span>
+                    </div>
+                  </td> */}
+                  <td className="py-4 px-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-sm text-gray-600">
+                        {issue.assignedStaff.name}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {issue.assignedStaff.email}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {issue.assignedStaff.phone}
                       </span>
                     </div>
                   </td>

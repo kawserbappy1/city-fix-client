@@ -29,57 +29,14 @@ const AllIssues = () => {
     },
   });
 
-  // Dummy data for assign modal
-  const availableAssignees = [
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@example.com",
-      phone: "+1234567890",
-      role: "Admin",
-      avatar: "JS",
+  const { data: staffs = [] } = useQuery({
+    queryKey: ["staff"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/approve-staff`);
+      return res.data;
     },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      phone: "+1234567891",
-      role: "Support Agent",
-      avatar: "SJ",
-    },
-    {
-      id: 3,
-      name: "Mike Williams",
-      email: "mike@example.com",
-      phone: "+1234567892",
-      role: "Field Agent",
-      avatar: "MW",
-    },
-    {
-      id: 4,
-      name: "Emma Davis",
-      email: "emma@example.com",
-      phone: "+1234567893",
-      role: "Manager",
-      avatar: "ED",
-    },
-    {
-      id: 5,
-      name: "Robert Wilson",
-      email: "robert@example.com",
-      phone: "+1234567894",
-      role: "Support Agent",
-      avatar: "RW",
-    },
-    {
-      id: 6,
-      name: "Lisa Brown",
-      email: "lisa@example.com",
-      phone: "+1234567895",
-      role: "Field Agent",
-      avatar: "LB",
-    },
-  ];
+  });
+  console.log(staffs);
 
   const handleViewIssue = (issue) => {
     setSelectedIssue(issue);
@@ -91,13 +48,55 @@ const AllIssues = () => {
     setIsAssignModalOpen(true);
   };
 
-  const handleAssignToPerson = (assignee) => {
-    // Here you would make an API call to assign the issue
-    console.log(`Assigning issue ${issueToAssign?._id} to ${assignee.name}`);
-    alert(`Issue assigned to ${assignee.name} successfully!`);
-    setIsAssignModalOpen(false);
-    setIssueToAssign(null);
-    refetch();
+  const assignIssueMutation = useMutation({
+    mutationFn: ({ issueId, staffId }) =>
+      axiosSecure.patch(`/issues/assign/${issueId}`, {
+        staffId,
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["issues"] });
+
+      Swal.fire({
+        icon: "success",
+        title: "Assigned!",
+        text: "Issue has been assigned successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setIsAssignModalOpen(false);
+      setIssueToAssign(null);
+    },
+
+    onError: (error) => {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Could not assign staff",
+      });
+    },
+  });
+
+  const handleAssignToPerson = (staff) => {
+    if (!issueToAssign?._id) return;
+
+    Swal.fire({
+      title: "Assign Issue?",
+      text: `Assign this issue to ${staff.name}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, assign",
+      confirmButtonColor: "#2563eb",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        assignIssueMutation.mutate({
+          issueId: issueToAssign._id,
+          staffId: staff._id,
+        });
+      }
+    });
   };
 
   const closeModal = () => {
@@ -292,14 +291,28 @@ const AllIssues = () => {
                     <td>
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-600">
-                          {issue.assignedTo?.charAt(0) || "U"}
+                          <img src={issue.assignedStaff.photo} alt="" />
                         </div>
-                        <span
-                          className="text-sm truncate max-w-[100px]"
-                          title={issue.assignedTo || "Unassigned"}
-                        >
-                          {issue.assignedTo || "Unassigned"}
-                        </span>
+                        <div className="flex flex-col">
+                          <span
+                            className="text-sm truncate max-w-[100px]"
+                            title={issue.assignedStaff.name || "Unassigned"}
+                          >
+                            {issue.assignedStaff.name || "Unassigned"}
+                          </span>
+                          <span
+                            className="text-sm truncate max-w-[100px]"
+                            title={issue.assignedStaff.email || "Unassigned"}
+                          >
+                            {issue.assignedStaff.email || "Unassigned"}
+                          </span>
+                          <span
+                            className="text-sm truncate max-w-[100px]"
+                            title={issue.assignedStaff.phone || "Unassigned"}
+                          >
+                            {issue.assignedStaff.phone || "Unassigned"}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td>
@@ -337,14 +350,27 @@ const AllIssues = () => {
                             Approved
                           </button>
                         )}
-                        <button
-                          onClick={() => handleAssignClick(issue)}
-                          className="btn btn-xs btn-outline btn-primary"
-                          title="Assign Issue"
-                        >
-                          <FiUser className="text-sm" />
-                          <span className="hidden sm:inline ml-1">Assign</span>
-                        </button>
+                        {issue.assign === "assigned" ? (
+                          <button
+                            disabled
+                            className="btn btn-xs btn-success cursor-not-allowed"
+                            title="Approved"
+                          >
+                            Assigned
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleAssignClick(issue)}
+                            className="btn btn-xs btn-outline btn-primary"
+                            title="Assign Issue"
+                          >
+                            <FiUser className="text-sm" />
+                            <span className="hidden sm:inline ml-1">
+                              Assign
+                            </span>
+                          </button>
+                        )}
+
                         <button
                           onClick={() => handleDeleteIssue(issue._id)}
                           className="btn btn-xs btn-outline btn-error"
@@ -691,34 +717,44 @@ const AllIssues = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {availableAssignees.map((person) => (
-                        <tr key={person.id} className="hover:bg-gray-50">
+                      {staffs.map((staff) => (
+                        <tr key={staff._id} className="hover:bg-gray-50">
                           <td>
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600">
-                                {person.avatar}
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
+                                <img
+                                  src={staff.staffPhoto}
+                                  alt={staff.name}
+                                  className="w-full"
+                                />
                               </div>
                               <div>
                                 <p className="font-medium text-gray-900">
-                                  {person.name}
+                                  {staff.name}
                                 </p>
                                 <p className="text-xs text-gray-500">
-                                  {person.email}
+                                  {staff.email}
                                 </p>
                               </div>
                             </div>
                           </td>
                           <td>
-                            <p className="text-gray-700">{person.phone}</p>
+                            <p className="text-gray-700">{staff.phone}</p>
                           </td>
-                          <td>
+                          <td className="flex flex-col gap-1">
                             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                              {person.role}
+                              {staff.division}
+                            </span>
+                            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                              {staff.district}
+                            </span>
+                            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                              {staff.upazila}
                             </span>
                           </td>
                           <td className="text-center">
                             <button
-                              onClick={() => handleAssignToPerson(person)}
+                              onClick={() => handleAssignToPerson(staff)}
                               className="btn btn-xs btn-outline btn-primary"
                               title="Assign to this person"
                             >
@@ -757,22 +793,8 @@ const AllIssues = () => {
                     <div>
                       <p className="text-sm text-gray-600">Total Available</p>
                       <p className="text-xl font-bold text-gray-800">
-                        {availableAssignees.length}
+                        {staffs.length}
                       </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Support Agents</p>
-                      <p className="text-xl font-bold text-gray-800">3</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Field Agents</p>
-                      <p className="text-xl font-bold text-gray-800">2</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        Currently Assigned
-                      </p>
-                      <p className="text-xl font-bold text-gray-800">12</p>
                     </div>
                   </div>
                 </div>

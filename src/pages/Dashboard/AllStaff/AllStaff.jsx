@@ -63,8 +63,42 @@ const AllStaff = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    console.log(`Delete staff with id: ${id}`);
+  const deleteStaffMutation = useMutation({
+    mutationFn: (id) => axiosSecure.delete(`/staff/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-staff"] });
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Staff has been deleted successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    },
+    onError: (err) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to approve staff.",
+      });
+      console.error(err);
+    },
+  });
+
+  const handleDeleteStaff = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to approve this staff member?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, approve",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteStaffMutation.mutate(id);
+      }
+    });
   };
 
   const closeModal = () => {
@@ -163,7 +197,7 @@ const AllStaff = () => {
                       {staff.status === "approved" ? "Approved" : "Approve"}
                     </button>
                     <button
-                      onClick={() => handleDelete(staff._id)}
+                      onClick={() => handleDeleteStaff(staff._id)}
                       className="inline-flex gap-1 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       <FaRegTrashAlt />
@@ -255,7 +289,7 @@ const AllStaff = () => {
                       Expert Area
                     </p>
                     <p className="text-gray-900">
-                      {selectedStaff?.expertArea || "N/A"}
+                      {selectedStaff?.category || "N/A"}
                     </p>
                   </div>
                   <div>

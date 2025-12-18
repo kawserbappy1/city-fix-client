@@ -23,6 +23,7 @@ import EditProfile from "../pages/Auth/Profile/EditProfile";
 import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
 import BeStaff from "../pages/BeStaff/BeStaff";
 import AllStaff from "../pages/Dashboard/AllStaff/AllStaff";
+import StaffProfile from "./../pages/Dashboard/StaffProfile/StaffProfile";
 
 const router = createBrowserRouter([
   {
@@ -134,6 +135,10 @@ const router = createBrowserRouter([
       {
         path: "all-staff",
         element: <AllStaff></AllStaff>,
+      },
+      {
+        path: "staff-profile",
+        element: <StaffProfile></StaffProfile>,
       },
     ],
   },

@@ -10,7 +10,12 @@ import {
   FiBell,
   FiLogOut,
 } from "react-icons/fi";
-import { FaBoxTissue, FaPencilRuler, FaRegEdit } from "react-icons/fa";
+import {
+  FaBoxTissue,
+  FaPencilRuler,
+  FaRegEdit,
+  FaUserCog,
+} from "react-icons/fa";
 import { RiEditBoxLine, RiUserCommunityLine } from "react-icons/ri";
 import { GiPayMoney } from "react-icons/gi";
 
@@ -45,6 +50,11 @@ const DashboardLayout = () => {
       path: "/dashboard/all-staff",
       label: "All Staff",
       icon: <RiUserCommunityLine />,
+    },
+    {
+      path: "/dashboard/staff-profile",
+      label: "Staff profile",
+      icon: <FaUserCog />,
     },
     { path: "/dashboard/settings", label: "Settings", icon: <FiSettings /> },
   ];
