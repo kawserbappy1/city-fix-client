@@ -12,19 +12,17 @@ import {
   FiUser,
   FiMail,
   FiPhone,
-  FiThumbsUp,
 } from "react-icons/fi";
 import { MdOutlinePendingActions } from "react-icons/md";
-import useAuth from "../../../hooks/useAuth";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
-import { formatExactDate } from "../../../Utilities/formatDate";
+import useAuth from "../../../../hooks/useAuth";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import { formatExactDate } from "../../../../Utilities/formatDate";
+import { Link } from "react-router";
 
 const MyIssues = () => {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
@@ -88,14 +86,12 @@ const MyIssues = () => {
   const handleEdit = (issue) => {
     if (issue.status !== "Approved") {
       setSelectedIssue(issue);
-      setEditModalOpen(true);
     }
   };
 
   const handleDelete = (issue) => {
     if (issue.status !== "Approved") {
       setSelectedIssue(issue);
-      setDeleteModalOpen(true);
     }
   };
 
@@ -228,8 +224,8 @@ const MyIssues = () => {
                   <td className="py-4 px-4">
                     <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
                       <img
-                        src={issue.issueImageURL}
-                        alt={issue.issueName}
+                        src={issue?.issueImageURL}
+                        alt={issue?.issueName}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -237,62 +233,55 @@ const MyIssues = () => {
                   <td className="py-4 px-4">
                     <div>
                       <h3 className="font-semibold text-gray-800 line-clamp-1">
-                        {issue.issueName}
+                        {issue?.issueName}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                            issue.priority
+                            issue?.priority
                           )}`}
                         >
-                          {issue.priority}
+                          {issue?.priority}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {issue.category}
+                          {issue?.category}
                         </span>
                       </div>
                       <span className="text-sm text-gray-600">
-                        {formatExactDate(issue.createdAt)}
+                        {formatExactDate(issue?.createdAt)}
                       </span>
                     </div>
                   </td>
-                  {/* <td className="py-4 px-4">
-                    <div className="flex items-center gap-2">
-                      <FiClock className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        {formatExactDate(issue.createdAt)}
-                      </span>
-                    </div>
-                  </td> */}
+
                   <td className="py-4 px-4">
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-sm text-gray-600">
-                        {issue.assignedStaff.name}
+                        {issue.assignedStaff?.name || issue?.assign}
                       </span>
                       <span className="text-sm text-gray-600">
-                        {issue.assignedStaff.email}
+                        {issue.assignedStaff?.email || ""}
                       </span>
                       <span className="text-sm text-gray-600">
-                        {issue.assignedStaff.phone}
+                        {issue.assignedStaff?.phone || ""}
                       </span>
                     </div>
                   </td>
                   <td className="py-4 px-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                        issue.status
+                        issue?.status
                       )}`}
                     >
-                      {issue.status}
+                      {issue?.status}
                     </span>
                   </td>
                   <td className="py-4 px-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${getWorkflowColor(
-                        issue.workflow
+                        issue?.workflow
                       )}`}
                     >
-                      {issue.workflow}
+                      {issue?.workflow}
                     </span>
                   </td>
                   <td className="py-4 px-4">
@@ -307,34 +296,35 @@ const MyIssues = () => {
                       </button>
 
                       {/* Edit Button - Disabled for Approved issues */}
-                      <button
-                        onClick={() => handleEdit(issue)}
-                        disabled={issue.status === "approved"}
-                        className={`p-2 rounded-lg transition-colors ${
-                          issue.status === "approved"
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-green-50 text-green-600 hover:bg-green-100"
-                        }`}
-                        title={
-                          issue.status === "approved"
-                            ? "Cannot edit approved issues"
-                            : "Edit Issue"
-                        }
-                      >
-                        <FiEdit2 className="w-4 h-4" />
-                      </button>
+                      {issue?.status === "approved" ? (
+                        <span
+                          className="p-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
+                          title="Cannot edit approved issues"
+                        >
+                          <FiEdit2 className="w-4 h-4" />
+                        </span>
+                      ) : (
+                        <Link
+                          to={`/dashboard/edit-issue/${issue._id}`}
+                          onClick={() => handleEdit(issue)}
+                          className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                          title="Edit Issue"
+                        >
+                          <FiEdit2 className="w-4 h-4" />
+                        </Link>
+                      )}
 
                       {/* Delete Button - Disabled for Approved issues */}
                       <button
                         onClick={() => handleDelete(issue)}
-                        disabled={issue.status === "approved"}
+                        disabled={issue?.status === "approved"}
                         className={`p-2 rounded-lg transition-colors ${
-                          issue.status === "approved"
+                          issue?.status === "approved"
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-red-50 text-red-600 hover:bg-red-100"
                         }`}
                         title={
-                          issue.status === "approved"
+                          issue?.status === "approved"
                             ? "Cannot delete approved issues"
                             : "Delete Issue"
                         }
@@ -428,7 +418,7 @@ const MyIssues = () => {
               </div>
 
               {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
                 {/* Left Column - Issue Details */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Category & Basic Info */}
@@ -575,47 +565,6 @@ const MyIssues = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Quick Actions */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h4 className="font-semibold text-gray-800 mb-4">
-                      Quick Actions
-                    </h4>
-                    <div className="space-y-3">
-                      <button className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
-                        <FiThumbsUp className="w-4 h-4" />
-                        Upvote Issue
-                      </button>
-                      <button className="w-full py-2.5 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium">
-                        Share Issue
-                      </button>
-                      {selectedIssue.status === "approved" && (
-                        <button className="w-full py-2.5 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors font-medium">
-                          View Progress
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Stats */}
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                      <div className="flex items-center justify-around">
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-gray-800">
-                            156
-                          </p>
-                          <p className="text-xs text-gray-500">Upvotes</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-gray-800">24</p>
-                          <p className="text-xs text-gray-500">Comments</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-gray-800">3</p>
-                          <p className="text-xs text-gray-500">Shares</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -634,364 +583,7 @@ const MyIssues = () => {
                   >
                     Close
                   </button>
-                  {selectedIssue.status !== "approved" && (
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                      Edit Issue
-                    </button>
-                  )}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal - Basic Structure */}
-      {editModalOpen && selectedIssue && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">
-                    Edit Issue
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Update your issue details. Fields marked with * are
-                    required.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setEditModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                  <FiXCircle className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column - Basic Information */}
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-3">
-                      Basic Information
-                    </h3>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Issue Name *
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={selectedIssue.issueName}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Enter issue title"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Category *
-                        </label>
-                        <select
-                          defaultValue={selectedIssue.category}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Category</option>
-                          <option value="Road or Potholes">
-                            Road or Potholes
-                          </option>
-                          <option value="Sanitation">Sanitation</option>
-                          <option value="Water Supply">Water Supply</option>
-                          <option value="Electricity">Electricity</option>
-                          <option value="Public Safety">Public Safety</option>
-                          <option value="Parks & Green Spaces">
-                            Parks & Green Spaces
-                          </option>
-                          <option value="Infrastructure">Infrastructure</option>
-                          <option value="Healthcare">Healthcare</option>
-                          <option value="Education">Education</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Priority *
-                        </label>
-                        <select
-                          defaultValue={selectedIssue.priority}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="High">High</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Low">Low</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Issue Image URL
-                        </label>
-                        <input
-                          type="url"
-                          defaultValue={selectedIssue.issueImageURL}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="https://example.com/image.jpg"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Enter a direct image URL
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Location Information */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <FiMapPin className="text-blue-500" />
-                      Location Information
-                    </h3>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Division *
-                        </label>
-                        <select
-                          defaultValue={selectedIssue.division}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="">Select Division</option>
-                          <option value="Dhaka">Dhaka</option>
-                          <option value="Chattogram">Chattogram</option>
-                          <option value="Rajshahi">Rajshahi</option>
-                          <option value="Khulna">Khulna</option>
-                          <option value="Barishal">Barishal</option>
-                          <option value="Sylhet">Sylhet</option>
-                          <option value="Rangpur">Rangpur</option>
-                          <option value="Mymensingh">Mymensingh</option>
-                        </select>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            District *
-                          </label>
-                          <input
-                            type="text"
-                            defaultValue={selectedIssue.district}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter district"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Upazila *
-                          </label>
-                          <input
-                            type="text"
-                            defaultValue={selectedIssue.upazila}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter upazila"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Complete Address
-                        </label>
-                        <textarea
-                          defaultValue={selectedIssue.address}
-                          rows="3"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Enter full address with details"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column - Description & Contact */}
-                <div className="space-y-4">
-                  {/* Description */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-3">
-                      Description *
-                    </h3>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Detailed Description
-                      </label>
-                      <textarea
-                        defaultValue={selectedIssue.description}
-                        rows="8"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Provide detailed description of the issue..."
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Include specific details, impact, and any relevant
-                        information
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Contact Information */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <FiUser className="text-blue-500" />
-                      Contact Information
-                    </h3>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Name *
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={selectedIssue.postedBy}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address *
-                        </label>
-                        <input
-                          type="email"
-                          defaultValue={selectedIssue.email}
-                          readOnly
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Enter your email"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Phone Number *
-                        </label>
-                        <input
-                          type="tel"
-                          defaultValue={selectedIssue.phoneNumber}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Enter phone number"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Image Preview */}
-                  {selectedIssue.issueImageURL && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-3">
-                        Image Preview
-                      </h3>
-                      <div className="aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
-                        <img
-                          src={selectedIssue.issueImageURL}
-                          alt="Current issue image"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E";
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        Current uploaded image
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Form Validation & Status */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="flex items-start gap-3">
-                  <FiAlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-blue-800 font-medium">
-                      Note: Once an issue is approved, it cannot be edited.
-                    </p>
-                    <p className="text-sm text-blue-700 mt-1">
-                      Current Status:{" "}
-                      <span
-                        className={`font-semibold ${
-                          selectedIssue.status === "approved"
-                            ? "text-green-600"
-                            : "text-yellow-600"
-                        }`}
-                      >
-                        {selectedIssue.status.charAt(0).toUpperCase() +
-                          selectedIssue.status.slice(1)}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                  Issue ID:{" "}
-                  <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-                    {selectedIssue._id?.slice(-8) || "N/A"}
-                  </code>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setEditModalOpen(false)}
-                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2">
-                    <FiEdit2 className="w-4 h-4" />
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {deleteModalOpen && selectedIssue && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-md">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiTrash2 className="w-8 h-8 text-red-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">
-                  Delete Issue
-                </h2>
-                <p className="text-gray-600">
-                  Are you sure you want to delete "
-                  <span className="font-medium">{selectedIssue.issueName}</span>
-                  "? This action cannot be undone.
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-3">
-                <button
-                  onClick={() => setDeleteModalOpen(false)}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
-                >
-                  Cancel
-                </button>
-                <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                  Delete Issue
-                </button>
               </div>
             </div>
           </div>

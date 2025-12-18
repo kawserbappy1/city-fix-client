@@ -14,16 +14,17 @@ import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Overview from "../pages/Dashboard/Overview/Overview";
 import Users from "../pages/Dashboard/Users/Users";
-import AllIssues from "../pages/Dashboard/AllIssues/AllIssues";
 import AllIssuesPage from "../pages/AllIssuesPage/AllIssuesPage";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
-import MyIssues from "../pages/Dashboard/MyIssues/MyIssues";
-import CreateIssue from "../pages/Dashboard/CreateIssue/CreateIssue";
 import EditProfile from "../pages/Auth/Profile/EditProfile";
-import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
 import BeStaff from "../pages/BeStaff/BeStaff";
-import AllStaff from "../pages/Dashboard/AllStaff/AllStaff";
-import StaffProfile from "./../pages/Dashboard/StaffProfile/StaffProfile";
+import AllIssues from "../pages/Dashboard/Admin/AllIssues/AllIssues";
+import AllStaff from "../pages/Dashboard/Admin/AllStaff/AllStaff";
+import AllUsers from "../pages/Dashboard/Admin/AllUsers/AllUsers";
+import CreateIssue from "../pages/Dashboard/UserDashboard/CreateIssue/CreateIssue";
+import MyIssues from "../pages/Dashboard/UserDashboard/MyIssues/MyIssues";
+import StaffProfile from "../pages/Dashboard/StaffDashboard/StaffProfile/StaffProfile";
+import EditIssue from "../pages/Dashboard/UserDashboard/EditIssue/EditIssue";
 
 const router = createBrowserRouter([
   {
@@ -135,6 +136,11 @@ const router = createBrowserRouter([
       {
         path: "all-staff",
         element: <AllStaff></AllStaff>,
+      },
+      {
+        path: "edit-issue/:id",
+        element: <EditIssue></EditIssue>,
+        loader: () => fetch("/area.json").then((res) => res.json()),
       },
       {
         path: "staff-profile",

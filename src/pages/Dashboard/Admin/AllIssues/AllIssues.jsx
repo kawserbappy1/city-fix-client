@@ -1,14 +1,14 @@
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { FiEye, FiTrash2, FiX, FiInfo, FiUser, FiCheck } from "react-icons/fi";
+import { FcApproval, FcCancel } from "react-icons/fc";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import {
   formatExactDate,
   formatRelativeTime,
-} from "../../../Utilities/formatDate";
-import { useState } from "react";
-import { FiEye, FiTrash2, FiX, FiInfo, FiUser, FiCheck } from "react-icons/fi";
-import { FcApproval } from "react-icons/fc";
-import Loader from "../../../components/Loader";
-import Swal from "sweetalert2";
+} from "../../../../Utilities/formatDate";
+import Loader from "../../../../components/Loader";
 
 const AllIssues = () => {
   const axiosSecure = useAxiosSecure();
@@ -17,11 +17,7 @@ const AllIssues = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [issueToAssign, setIssueToAssign] = useState(null);
   const queryClient = useQueryClient();
-  const {
-    data: issues = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: issues = [], isLoading } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
       const res = await axiosSecure.get(`/issues`);
@@ -259,65 +255,67 @@ const AllIssues = () => {
                     <td>
                       <div
                         className="font-semibold text-gray-800 max-w-[180px] truncate"
-                        title={issue.issueName}
+                        title={issue?.issueName}
                       >
-                        {issue.issueName}
+                        {issue?.issueName}
                       </div>
                       <div
                         className="text-xs text-gray-500 truncate max-w-[180px]"
-                        title={issue.category}
+                        title={issue?.category}
                       >
-                        {issue.category} • {issue.district}
+                        {issue?.category} • {issue?.district}
                       </div>
                     </td>
                     <td>
                       <div className="group relative inline-block">
                         <span className="text-sm text-gray-600 cursor-help">
-                          {formatRelativeTime(issue.createdAt)}
+                          {formatRelativeTime(issue?.createdAt)}
                         </span>
                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                          {formatExactDate(issue.createdAt)}
+                          {formatExactDate(issue?.createdAt)}
                           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
                         </div>
                       </div>
                     </td>
                     <td>
                       <span
-                        className={`badge ${getPriorityColor(issue.priority)}`}
+                        className={`badge ${getPriorityColor(issue?.priority)}`}
                       >
-                        {issue.priority}
+                        {issue?.priority}
                       </span>
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-600">
-                          <img src={issue.assignedStaff.photo} alt="" />
+                          <img src={issue.assignedStaff?.photo} alt="" />
                         </div>
                         <div className="flex flex-col">
                           <span
                             className="text-sm truncate max-w-[100px]"
-                            title={issue.assignedStaff.name || "Unassigned"}
+                            title={issue.assignedStaff?.name || "Unassigned"}
                           >
-                            {issue.assignedStaff.name || "Unassigned"}
+                            {issue.assignedStaff?.name || "Unassigned"}
                           </span>
                           <span
                             className="text-sm truncate max-w-[100px]"
-                            title={issue.assignedStaff.email || "Unassigned"}
+                            title={issue.assignedStaff?.email || "Unassigned"}
                           >
-                            {issue.assignedStaff.email || "Unassigned"}
+                            {issue.assignedStaff?.email || "Unassigned"}
                           </span>
                           <span
                             className="text-sm truncate max-w-[100px]"
-                            title={issue.assignedStaff.phone || "Unassigned"}
+                            title={issue.assignedStaff?.phone || "Unassigned"}
                           >
-                            {issue.assignedStaff.phone || "Unassigned"}
+                            {issue.assignedStaff?.phone || "Unassigned"}
                           </span>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span className={`badge ${getStatusColor(issue.status)}`}>
-                        {issue.status}
+                      <span
+                        className={`badge ${getStatusColor(issue?.status)}`}
+                      >
+                        {issue?.status}
                       </span>
                     </td>
                     <td>
@@ -328,18 +326,14 @@ const AllIssues = () => {
                           title="View Details"
                         >
                           <FiEye className="text-sm" />
-                          <span className="hidden sm:inline ml-1">View</span>
                         </button>
-                        {issue.status === "pending" ? (
+                        {issue?.status === "pending" ? (
                           <button
                             onClick={() => approveMutation.mutate(issue._id)}
                             className="btn btn-xs btn-outline btn-success"
                             title="Approve"
                           >
                             <FcApproval className="text-sm" />
-                            <span className="hidden sm:inline ml-1">
-                              Approve
-                            </span>
                           </button>
                         ) : (
                           <button
@@ -347,37 +341,31 @@ const AllIssues = () => {
                             className="btn btn-xs btn-success cursor-not-allowed"
                             title="Approved"
                           >
-                            Approved
-                          </button>
-                        )}
-                        {issue.assign === "assigned" ? (
-                          <button
-                            disabled
-                            className="btn btn-xs btn-success cursor-not-allowed"
-                            title="Approved"
-                          >
-                            Assigned
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleAssignClick(issue)}
-                            className="btn btn-xs btn-outline btn-primary"
-                            title="Assign Issue"
-                          >
-                            <FiUser className="text-sm" />
-                            <span className="hidden sm:inline ml-1">
-                              Assign
-                            </span>
+                            <FcApproval className="text-sm" />
                           </button>
                         )}
 
+                        <button
+                          onClick={() => handleAssignClick(issue)}
+                          className="btn btn-xs btn-outline btn-primary"
+                          title="Assign Issue"
+                        >
+                          <FiUser className="text-sm" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteIssue(issue._id)}
+                          className="btn btn-xs btn-outline btn-error"
+                          title="Reject Issue"
+                        >
+                          <FcCancel className="text-sm" />
+                        </button>
                         <button
                           onClick={() => handleDeleteIssue(issue._id)}
                           className="btn btn-xs btn-outline btn-error"
                           title="Delete Issue"
                         >
                           <FiTrash2 className="text-sm" />
-                          <span className="hidden sm:inline ml-1">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -428,7 +416,7 @@ const AllIssues = () => {
                   </label>
                   <div className="max-w-2xl w-full mx-auto">
                     <img
-                      src={selectedIssue.issueImageURL}
+                      src={selectedIssue?.issueImageURL}
                       alt=""
                       className="size-1/2"
                     />
@@ -446,7 +434,7 @@ const AllIssues = () => {
                         <div>
                           <p className="text-sm text-gray-600">Issue Name</p>
                           <p className="font-medium text-gray-900 mt-1">
-                            {selectedIssue.issueName}
+                            {selectedIssue?.issueName}
                           </p>
                         </div>
                         <div>
@@ -455,17 +443,17 @@ const AllIssues = () => {
                           </p>
                           <div className="flex items-center gap-3 mt-1">
                             <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-                              {selectedIssue.category}
+                              {selectedIssue?.category}
                             </span>
                             <span className="text-gray-700">•</span>
                             <span className="text-gray-700">
-                              {selectedIssue.district}
+                              {selectedIssue?.district}
                             </span>
-                            {selectedIssue.area && (
+                            {selectedIssue?.area && (
                               <>
                                 <span className="text-gray-700">•</span>
                                 <span className="text-gray-700">
-                                  {selectedIssue.area}
+                                  {selectedIssue?.area}
                                 </span>
                               </>
                             )}
@@ -474,7 +462,7 @@ const AllIssues = () => {
                         <div>
                           <p className="text-sm text-gray-600">Posted By</p>
                           <p className="font-medium text-gray-900 mt-1">
-                            {selectedIssue.postedBy}
+                            {selectedIssue?.postedBy}
                           </p>
                         </div>
                       </div>
@@ -488,14 +476,14 @@ const AllIssues = () => {
                         <div>
                           <p className="text-sm text-gray-600">Phone Number</p>
                           <p className="font-medium text-gray-900 mt-1">
-                            {selectedIssue.phoneNumber}
+                            {selectedIssue?.phoneNumber}
                           </p>
                         </div>
-                        {selectedIssue.email && (
+                        {selectedIssue?.email && (
                           <div>
                             <p className="text-sm text-gray-600">Email</p>
                             <p className="font-medium text-gray-900 mt-1">
-                              {selectedIssue.email}
+                              {selectedIssue?.email}
                             </p>
                           </div>
                         )}
@@ -514,20 +502,20 @@ const AllIssues = () => {
                           <p className="text-sm text-gray-600 mb-2">Priority</p>
                           <div
                             className={`badge ${getPriorityColor(
-                              selectedIssue.priority
+                              selectedIssue?.priority
                             )} badge-lg font-semibold`}
                           >
-                            {selectedIssue.priority}
+                            {selectedIssue?.priority}
                           </div>
                         </div>
                         <div className="flex-1">
                           <p className="text-sm text-gray-600 mb-2">Status</p>
                           <div
                             className={`badge ${getStatusColor(
-                              selectedIssue.status
+                              selectedIssue?.status
                             )} badge-lg font-semibold`}
                           >
-                            {selectedIssue.status}
+                            {selectedIssue?.status}
                           </div>
                         </div>
                       </div>
@@ -542,13 +530,13 @@ const AllIssues = () => {
                           <p className="text-sm text-gray-600">Assigned To</p>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600">
-                              {selectedIssue.assignedTo?.charAt(0) || "U"}
+                              {selectedIssue?.assignedTo?.charAt(0) || "U"}
                             </div>
                             <div>
                               <p className="font-medium text-gray-900">
-                                {selectedIssue.assignedTo || "Not assigned"}
+                                {selectedIssue?.assignedTo || "Not assigned"}
                               </p>
-                              {selectedIssue.assignedTo && (
+                              {selectedIssue?.assignedTo && (
                                 <p className="text-xs text-gray-500">
                                   Click "Assign" to change
                                 </p>
@@ -559,14 +547,14 @@ const AllIssues = () => {
                         <div>
                           <p className="text-sm text-gray-600">Created</p>
                           <p className="font-medium text-gray-900 mt-1">
-                            {formatExactDate(selectedIssue.createdAt)}
+                            {formatExactDate(selectedIssue?.createdAt)}
                           </p>
                         </div>
-                        {selectedIssue.assignedDate && (
+                        {selectedIssue?.assignedDate && (
                           <div>
                             <p className="text-sm text-gray-600">Assigned On</p>
                             <p className="font-medium text-gray-900 mt-1">
-                              {formatExactDate(selectedIssue.assignedDate)}
+                              {formatExactDate(selectedIssue?.assignedDate)}
                             </p>
                           </div>
                         )}
@@ -576,21 +564,21 @@ const AllIssues = () => {
                 </div>
 
                 {/* Description Section */}
-                {selectedIssue.description && (
+                {selectedIssue?.description && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                       Description
                     </label>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-gray-700 whitespace-pre-line">
-                        {selectedIssue.description}
+                        {selectedIssue?.description}
                       </p>
                     </div>
                   </div>
                 )}
 
                 {/* Additional Details */}
-                {selectedIssue.landmark && (
+                {selectedIssue?.landmark && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                       Location Details
@@ -599,14 +587,14 @@ const AllIssues = () => {
                       <div>
                         <p className="text-sm text-gray-600">District</p>
                         <p className="font-medium text-gray-900 mt-1">
-                          {selectedIssue.district}
+                          {selectedIssue?.district}
                         </p>
                       </div>
-                      {selectedIssue.landmark && (
+                      {selectedIssue?.landmark && (
                         <div>
                           <p className="text-sm text-gray-600">Landmark</p>
                           <p className="font-medium text-gray-900 mt-1">
-                            {selectedIssue.landmark}
+                            {selectedIssue?.landmark}
                           </p>
                         </div>
                       )}

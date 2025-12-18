@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEye, FaRegTrashAlt } from "react-icons/fa";
 import { FcApproval } from "react-icons/fc";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
 const AllStaff = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);

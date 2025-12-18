@@ -2,15 +2,19 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import axios from "axios";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
-import useAuth from "../../../hooks/useAuth";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import useAuth from "../../../../hooks/useAuth";
+import UseMembership from "../../../../hooks/UseMembership";
+import usePostUsage from "../../../../hooks/usePostUsage";
 
 const CreateIssue = () => {
   const areas = useLoaderData();
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState(null);
+  const { membership } = UseMembership();
+  const { usage } = usePostUsage();
   const {
     register,
     handleSubmit,
@@ -20,7 +24,11 @@ const CreateIssue = () => {
     control,
     reset,
   } = useForm();
+  const isLimitReached =
+    usage?.limit !== null && usage?.postCount >= usage?.limit;
+  console.log(isLimitReached, usage);
 
+  console.log(usage, isLimitReached);
   // Watch the division and district fields
   const selectedDivision = useWatch({
     control,
@@ -89,17 +97,22 @@ const CreateIssue = () => {
             .post("/issues", issueInfo)
             .then((res) => {
               reset();
-              if (res.data.insertedId) {
+              Swal.fire({
+                icon: "success",
+                text: "Issue posted successfully",
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            })
+            .catch((error) => {
+              if (error.response?.status === 403) {
                 Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  text: "Your Issue Successfully Added. You will be notified when admin approve your post.",
-                  showConfirmButton: false,
-                  timer: 2500,
+                  icon: "error",
+                  title: "Limit Reached",
+                  text: error.response.data.message,
                 });
               }
-            })
-            .catch((error) => console.log(error));
+            });
         }
       });
     } catch (error) {
@@ -154,7 +167,15 @@ const CreateIssue = () => {
     "Traffic & Signals",
   ];
 
-  const priorities = ["Low", "Medium", "High"];
+  const priorities = [
+    { label: "Low", value: "low", disabled: false },
+    { label: "Medium", value: "medium", disabled: false },
+    {
+      label: "High",
+      value: "high",
+      disabled: membership === "free",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-25 px-4">
@@ -166,6 +187,12 @@ const CreateIssue = () => {
         <p className="text-gray-600">
           Help us improve your community by reporting issues. Fill in the
           details below.
+        </p>
+
+        <p className="text-gray-600 mt-2">
+          You are {usage.membership} user. Your reaminig post
+          <span className="text-red-500 font-bold"> {usage.remaining} </span>
+          of <span className="font-bold"> {usage.limit}</span>
         </p>
       </div>
 
@@ -451,6 +478,7 @@ const CreateIssue = () => {
               <label className="block text-sm font-semibold text-gray-700">
                 Priority <span className="text-red-500">*</span>
               </label>
+
               <select
                 {...register("priority", { required: "Priority is required" })}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
@@ -458,12 +486,31 @@ const CreateIssue = () => {
                 }`}
               >
                 <option value="">Select priority</option>
+
                 {priorities.map((priority) => (
-                  <option key={priority} value={priority}>
-                    {priority}
+                  <option
+                    key={priority.value}
+                    value={priority.value}
+                    disabled={priority.disabled}
+                    title={
+                      priority.disabled
+                        ? "You can't select High priority on free plan"
+                        : ""
+                    }
+                  >
+                    {priority.label}
+                    {priority.disabled ? " 🔒" : ""}
                   </option>
                 ))}
               </select>
+
+              {/* Tooltip Message (Visible only for Free User) */}
+              {membership === "free" && (
+                <p className="text-xs text-yellow-600 flex items-center gap-1">
+                  ⚠️ High priority is available for premium users only
+                </p>
+              )}
+
               {errors.priority && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.priority.message}
@@ -554,10 +601,21 @@ const CreateIssue = () => {
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-md hover:shadow-lg"
+              disabled={isLimitReached}
+              className={`w-full py-3 rounded-lg ${
+                isLimitReached
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               Submit Issue
             </button>
+            {isLimitReached && (
+              <p className="text-red-500 text-sm mt-2">
+                🚫 You have reached your posting limit. Upgrade your plan to
+                post more issues.
+              </p>
+            )}
           </div>
         </form>
       </div>

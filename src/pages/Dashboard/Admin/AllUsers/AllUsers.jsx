@@ -1,14 +1,12 @@
 import { FiUser, FiEdit2, FiTrash2, FiShield, FiStar } from "react-icons/fi";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "react-router";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
 const AllUsers = () => {
-  const { id } = useSearchParams();
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
-  const { data: allUsers = [], isLoading } = useQuery({
+  const { data: allUsers = [] } = useQuery({
     queryKey: ["AllIssues"],
     queryFn: async () => {
       const res = await axiosSecure("/user");

@@ -11,5 +11,3 @@ export const imageUpload = async (imageData) => {
   console.log(data?.data?.display_url);
   return data?.data?.display_url;
 };
-
-// // save or update user in db

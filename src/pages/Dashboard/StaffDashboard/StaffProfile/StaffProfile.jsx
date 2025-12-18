@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { FaDownload, FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import jsPDF from "jspdf";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import useAuth from "../../../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import useAuth from "../../../../hooks/useAuth";
 
 const StaffProfile = () => {
   const axiosSecure = useAxiosSecure();
