@@ -201,6 +201,8 @@ const AllIssues = () => {
         return "badge-info text-white";
       case "pending":
         return "badge-warning text-white";
+      case "working":
+        return "badge-secondary text-white";
       default:
         return "badge-neutral";
     }
@@ -250,6 +252,7 @@ const AllIssues = () => {
                 <th className="font-semibold text-gray-700">Priority</th>
                 <th className="font-semibold text-gray-700">Assign To</th>
                 <th className="font-semibold text-gray-700">Status</th>
+                <th className="font-semibold text-gray-700">WorkFlow</th>
                 <th className="font-semibold text-gray-700 text-center">
                   Actions
                 </th>
@@ -338,6 +341,13 @@ const AllIssues = () => {
                         className={`badge ${getStatusColor(issue?.status)}`}
                       >
                         {issue?.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`badge ${getStatusColor(issue?.workflow)}`}
+                      >
+                        {issue?.workflow}
                       </span>
                     </td>
                     <td>

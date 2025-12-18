@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaEye } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import useAuth from "../../../../hooks/useAuth";
+import Swal from "sweetalert2";
 
 const AssignedIssue = () => {
+  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["assigned-issues", user?.email],
@@ -16,21 +20,83 @@ const AssignedIssue = () => {
     },
   });
 
-  // State for modal
-  const [selectedIssue, setSelectedIssue] = React.useState(null);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
   const handleView = (issue) => {
+    console.log("Viewing issue:", issue);
     setSelectedIssue(issue);
     setIsModalOpen(true);
   };
 
-  const handleAccept = (id) => {
-    console.log(`Accept issue with id: ${id}`);
-  };
+  const acceptMutation = useMutation({
+    mutationFn: (id) => axiosSecure.patch(`/accept-issu/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assigned-issues"] });
+      Swal.fire({
+        icon: "success",
+        title: "Accepted",
+        text: "Issue has been accepeted successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Could not assign staff",
+      });
+    },
+  });
 
-  const handleComplete = (id) => {
-    console.log(`Complete issue with id: ${id}`);
+  const handleAcceptIssue = (id) => {
+    Swal.fire({
+      title: "Accept Issue?",
+      text: `you are accepted to issue`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, assign",
+      confirmButtonColor: "#2563eb",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        acceptMutation.mutate(id);
+      }
+    });
+  };
+  const resolvedMutation = useMutation({
+    mutationFn: (id) => axiosSecure.patch(`/resolved-issu/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assigned-issues"] });
+      Swal.fire({
+        icon: "success",
+        title: "Resolved",
+        text: "Issue has been resolved successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Could not assign staff",
+      });
+    },
+  });
+
+  const handleresolvedIssue = (id) => {
+    Swal.fire({
+      title: "resolved Issue?",
+      text: `you are resolved to issue`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, assign",
+      confirmButtonColor: "#2563eb",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        resolvedMutation.mutate(id);
+      }
+    });
   };
 
   const closeModal = () => {
@@ -38,10 +104,26 @@ const AssignedIssue = () => {
     setSelectedIssue(null);
   };
 
+  // Debug: Check if data is loading
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="ml-4">Loading issues...</p>
+      </div>
+    );
+  }
+
+  // Debug: Check if data is empty
+  if (!issues || issues.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          Assigned Issues
+        </h2>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <p className="text-yellow-800">No assigned issues found.</p>
+        </div>
       </div>
     );
   }
@@ -49,6 +131,11 @@ const AssignedIssue = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Assigned Issues</h2>
+
+      {/* Debug info - remove in production */}
+      <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
+        <p>Total issues: {issues.length}</p>
+      </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
@@ -76,9 +163,11 @@ const AssignedIssue = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {issue.issueName}
+                    {issue.issueName || "No Name"}
                   </div>
-                  <div className="text-sm text-gray-500">{issue.category}</div>
+                  <div className="text-sm text-gray-500">
+                    {issue.category || "No Category"}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
@@ -92,7 +181,7 @@ const AssignedIssue = () => {
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {issue.status}
+                    {issue.status || "Unknown"}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -103,14 +192,28 @@ const AssignedIssue = () => {
                     >
                       <FaEye className="mr-1" /> View
                     </button>
+
                     <button
-                      onClick={() => handleAccept(issue._id)}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200"
+                      onClick={() => handleAcceptIssue(issue._id)}
+                      disabled={issue?.workflow === "working"}
+                      className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition-colors
+    ${
+      issue?.workflow === "working"
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+        : "text-green-700 bg-green-100 hover:bg-green-200 hover:shadow-sm"
+    }
+  `}
+                      title={
+                        issue?.workflow === "working"
+                          ? "Issue already accepted and in progress"
+                          : "Accept this issue"
+                      }
                     >
                       Accept
                     </button>
+
                     <button
-                      onClick={() => handleComplete(issue._id)}
+                      onClick={() => handleresolvedIssue(issue._id)}
                       className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200"
                     >
                       Complete
@@ -123,257 +226,256 @@ const AssignedIssue = () => {
         </table>
       </div>
 
-      {/* Modal for Viewing Issue Details */}
+      {/* Modal - Fixed positioning */}
       {isModalOpen && selectedIssue && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-              onClick={closeModal}
-            ></div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Issue Details: {selectedIssue.issueName || "No Name"}
+                </h3>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Issue Details
-                      </h3>
-                      <button
-                        onClick={closeModal}
-                        className="text-gray-400 hover:text-gray-500"
-                      >
-                        <svg
-                          className="h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Left Column */}
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                            Issue Information
-                          </h4>
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Issue Name
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.issueName}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Category
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.category}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Priority
-                              </p>
-                              <span
-                                className={`px-2 py-1 text-xs font-semibold rounded ${
-                                  selectedIssue.priority === "high"
-                                    ? "bg-red-100 text-red-800"
-                                    : selectedIssue.priority === "medium"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {selectedIssue.priority}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Description
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.description}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                            Location Information
-                          </h4>
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Division
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.division}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                District
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.district}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Upazila
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.upazila}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Address
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.address}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+              {/* Issue Content */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      Basic Information
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Issue Name
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.issueName || "N/A"}
+                        </p>
                       </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Category
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.category || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Priority
+                        </p>
+                        <span
+                          className={`px-3 py-1 text-sm font-medium rounded-full ${
+                            selectedIssue.priority === "high"
+                              ? "bg-red-100 text-red-800"
+                              : selectedIssue.priority === "medium"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {selectedIssue.priority || "N/A"}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Description
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.description || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-                      {/* Right Column */}
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                            User Information
-                          </h4>
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Posted By
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.postedBy}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Email
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.email}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Phone Number
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.phoneNumber}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                            Status Information
-                          </h4>
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Status
-                              </p>
-                              <span
-                                className={`px-2 py-1 text-xs font-semibold rounded ${
-                                  selectedIssue.status === "approved"
-                                    ? "bg-green-100 text-green-800"
-                                    : selectedIssue.status === "pending"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {selectedIssue.status}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Workflow
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.workflow}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Assignment
-                              </p>
-                              <p className="text-gray-900">
-                                {selectedIssue.assign}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Created At
-                              </p>
-                              <p className="text-gray-900">
-                                {new Date(
-                                  selectedIssue.createdAt
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Approved At
-                              </p>
-                              <p className="text-gray-900">
-                                {new Date(
-                                  selectedIssue.approvedAt
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                            Issue Image
-                          </h4>
-                          <img
-                            src={selectedIssue.issueImageURL}
-                            alt={selectedIssue.issueName}
-                            className="w-full h-auto rounded-lg shadow-md"
-                            onError={(e) => {
-                              e.target.src =
-                                "https://via.placeholder.com/400x300";
-                            }}
-                          />
-                        </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      Location Details
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Division
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.division || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          District
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.district || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Upazila
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.upazila || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Address
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.address || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Right Column */}
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      User Information
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Posted By
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.postedBy || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Email
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.email || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Phone Number
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.phoneNumber || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      Status Information
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Status
+                        </p>
+                        <span
+                          className={`px-3 py-1 text-sm font-medium rounded-full ${
+                            selectedIssue.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : selectedIssue.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {selectedIssue.status || "N/A"}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Workflow
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.workflow || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Assignment
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.assign || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Created At
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.createdAt
+                            ? new Date(
+                                selectedIssue.createdAt
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">
+                          Approved At
+                        </p>
+                        <p className="text-gray-900">
+                          {selectedIssue.approvedAt
+                            ? new Date(
+                                selectedIssue.approvedAt
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      Issue Image
+                    </h4>
+                    <img
+                      src={
+                        selectedIssue.issueImageURL ||
+                        "https://via.placeholder.com/400x300"
+                      }
+                      alt={selectedIssue.issueName || "Issue Image"}
+                      className="w-full h-auto rounded-lg shadow-md"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/400x300";
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Close
-                </button>
+              {/* Modal Footer */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex justify-end">
+                  <button
+                    onClick={closeModal}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
