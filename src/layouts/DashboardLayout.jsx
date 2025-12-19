@@ -65,6 +65,11 @@ const userMenu = [
     label: "Create Issue",
     icon: <FaRegEdit />,
   },
+  {
+    path: "/dashboard/be-staff",
+    label: "Become Staff",
+    icon: <RiUserCommunityLine />,
+  },
   { path: "/dashboard/my-issues", label: "My Issues", icon: <FaPencilRuler /> },
 ];
 

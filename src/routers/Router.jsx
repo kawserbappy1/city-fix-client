@@ -147,6 +147,11 @@ const router = createBrowserRouter([
         path: "assign-issue",
         element: <AssignedIssue></AssignedIssue>,
       },
+      {
+        path: "be-staff",
+        element: <BeStaff></BeStaff>,
+        loader: () => fetch(`/area.json`).then((res) => res.json()),
+      },
     ],
   },
 ]);

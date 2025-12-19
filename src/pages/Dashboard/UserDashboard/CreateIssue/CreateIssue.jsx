@@ -7,6 +7,7 @@ import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import useAuth from "../../../../hooks/useAuth";
 import UseMembership from "../../../../hooks/UseMembership";
 import usePostUsage from "../../../../hooks/usePostUsage";
+import { IoIosWarning } from "react-icons/io";
 
 const CreateIssue = () => {
   const areas = useLoaderData();
@@ -189,8 +190,10 @@ const CreateIssue = () => {
           details below.
         </p>
 
-        <p className="text-gray-600 mt-2">
-          You are {usage?.membership} user. Your reaminig post
+        <p className="text-gray-600 mt-2 flex items-center gap-2">
+          <IoIosWarning className="text-red-500" />
+          You are <span className=" font-bold">{usage?.membership}</span> user.
+          Your reaminig post
           <span className="text-red-500 font-bold"> {usage?.remaining} </span>
           of <span className="font-bold"> {usage?.limit}</span>
         </p>
