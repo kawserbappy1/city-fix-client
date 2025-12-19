@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import useAuth from "../../../../hooks/useAuth";
 import Swal from "sweetalert2";
+import { FiAlertCircle } from "react-icons/fi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const AssignedIssue = () => {
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -19,6 +21,9 @@ const AssignedIssue = () => {
       return res.data;
     },
   });
+  const completedCount = issues.filter(
+    (i) => i.workflow === "resolved" && i.assignedStaff.email
+  );
 
   const handleView = (issue) => {
     console.log("Viewing issue:", issue);
@@ -131,10 +136,34 @@ const AssignedIssue = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Assigned Issues</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-2 mb-8">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Issues</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {issues.length}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <FiAlertCircle className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
 
-      {/* Debug info - remove in production */}
-      <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
-        <p>Total issues: {issues.length}</p>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Completed</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {completedCount.length}
+              </p>
+            </div>
+            <div className="p-3 bg-yellow-50 rounded-lg">
+              <AiOutlineLoading3Quarters className="w-6 h-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
@@ -195,14 +224,17 @@ const AssignedIssue = () => {
 
                     <button
                       onClick={() => handleAcceptIssue(issue._id)}
-                      disabled={issue?.workflow === "working"}
+                      disabled={
+                        issue?.workflow === "Working" ||
+                        issue?.workflow === "resolved"
+                      }
                       className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition-colors
-    ${
-      issue?.workflow === "working"
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-        : "text-green-700 bg-green-100 hover:bg-green-200 hover:shadow-sm"
-    }
-  `}
+                        ${
+                          issue?.workflow === "Working" ||
+                          issue?.workflow === "resolved"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "text-green-700 bg-green-100 hover:bg-green-200 hover:shadow-sm"
+                        }`}
                       title={
                         issue?.workflow === "working"
                           ? "Issue already accepted and in progress"
@@ -214,7 +246,19 @@ const AssignedIssue = () => {
 
                     <button
                       onClick={() => handleresolvedIssue(issue._id)}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200"
+                      disabled={issue?.workflow === "resolved"}
+                      className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md 
+                        ${
+                          issue?.workflow === "resolved"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "text-purple-700 bg-purple-100 hover:bg-purple-200 hover:shadow-sm"
+                        }
+                        `}
+                      title={
+                        issue?.workflow === "resolved"
+                          ? "Issue already compeled and resolved"
+                          : "complete this issue"
+                      }
                     >
                       Complete
                     </button>

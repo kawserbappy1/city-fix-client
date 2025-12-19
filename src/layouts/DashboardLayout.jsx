@@ -20,6 +20,7 @@ import {
   FaUserCog,
 } from "react-icons/fa";
 import { PiMoney } from "react-icons/pi";
+import { LuTrainTrack } from "react-icons/lu";
 
 import { RiEditBoxLine, RiUserCommunityLine } from "react-icons/ri";
 import { GiPayMoney } from "react-icons/gi";
@@ -71,6 +72,11 @@ const userMenu = [
     icon: <RiUserCommunityLine />,
   },
   { path: "/dashboard/my-issues", label: "My Issues", icon: <FaPencilRuler /> },
+  {
+    path: "/dashboard/track-issue",
+    label: "Track Issue",
+    icon: <LuTrainTrack />,
+  },
 ];
 
 const commonMenu = [

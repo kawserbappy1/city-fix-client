@@ -25,6 +25,7 @@ import MyIssues from "../pages/Dashboard/UserDashboard/MyIssues/MyIssues";
 import StaffProfile from "../pages/Dashboard/StaffDashboard/StaffProfile/StaffProfile";
 import EditIssue from "../pages/Dashboard/UserDashboard/EditIssue/EditIssue";
 import AssignedIssue from "../pages/Dashboard/StaffDashboard/AssignedIssu/AssignedIssu";
+import TrackIssue from "../pages/Dashboard/UserDashboard/TrackIssue/TrackIssue";
 
 const router = createBrowserRouter([
   {
@@ -151,6 +152,10 @@ const router = createBrowserRouter([
         path: "be-staff",
         element: <BeStaff></BeStaff>,
         loader: () => fetch(`/area.json`).then((res) => res.json()),
+      },
+      {
+        path: "track-issue",
+        element: <TrackIssue></TrackIssue>,
       },
     ],
   },
