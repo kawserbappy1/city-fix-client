@@ -26,6 +26,8 @@ import StaffProfile from "../pages/Dashboard/StaffDashboard/StaffProfile/StaffPr
 import EditIssue from "../pages/Dashboard/UserDashboard/EditIssue/EditIssue";
 import AssignedIssue from "../pages/Dashboard/StaffDashboard/AssignedIssu/AssignedIssu";
 import TrackIssue from "../pages/Dashboard/UserDashboard/TrackIssue/TrackIssue";
+import AdminRoute from "./AdminRoute";
+import BoostIssue from "../pages/Dashboard/UserDashboard/BoostIssue/BoostIssue";
 
 const router = createBrowserRouter([
   {
@@ -112,7 +114,11 @@ const router = createBrowserRouter([
 
       {
         path: "all-issues",
-        element: <AllIssues></AllIssues>,
+        element: (
+          <AdminRoute>
+            <AllIssues></AllIssues>
+          </AdminRoute>
+        ),
       },
       {
         path: "my-issues",
@@ -129,11 +135,19 @@ const router = createBrowserRouter([
       },
       {
         path: "all-users",
-        element: <AllUsers></AllUsers>,
+        element: (
+          <AdminRoute>
+            <AllUsers></AllUsers>
+          </AdminRoute>
+        ),
       },
       {
         path: "all-staff",
-        element: <AllStaff></AllStaff>,
+        element: (
+          <AdminRoute>
+            <AllStaff></AllStaff>
+          </AdminRoute>
+        ),
       },
       {
         path: "edit-issue/:id",
@@ -146,7 +160,11 @@ const router = createBrowserRouter([
       },
       {
         path: "assign-issue",
-        element: <AssignedIssue></AssignedIssue>,
+        element: (
+          <AdminRoute>
+            <AssignedIssue></AssignedIssue>
+          </AdminRoute>
+        ),
       },
       {
         path: "be-staff",
@@ -156,6 +174,10 @@ const router = createBrowserRouter([
       {
         path: "track-issue",
         element: <TrackIssue></TrackIssue>,
+      },
+      {
+        path: "boost-issue",
+        element: <BoostIssue></BoostIssue>,
       },
     ],
   },

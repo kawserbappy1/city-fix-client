@@ -1,6 +1,7 @@
 import Slider from "../../../components/Slider";
 import Brand from "../Brand/Brand";
 import HowItWorks from "../HowItWorks/HowItWorks";
+import IssueCard from "../IssueCard/IssueCard";
 import IssueContainer from "../IssueCard/IssueContainer";
 import Pricing from "../Pricing/Pricing";
 import Technician from "../Technician/Technician";
@@ -13,6 +14,7 @@ const Home = () => {
     <div>
       <Slider></Slider>
       <IssueContainer></IssueContainer>
+      <IssueCard />
       <WhyChoose></WhyChoose>
       <Pricing></Pricing>
       <Technician></Technician>

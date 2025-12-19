@@ -84,6 +84,13 @@ const IssueDetails = () => {
                   >
                     {issue?.priority} Priority
                   </span>
+                  <span
+                    className={`px-4 py-2 ml-1 rounded-full text-sm font-semibold border ${getPriorityColor(
+                      issue?.workflow
+                    )}`}
+                  >
+                    {issue?.workflow}
+                  </span>
                 </div>
                 <div className="absolute top-4 right-4">
                   <span className="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-semibold border border-blue-100">
@@ -317,27 +324,16 @@ const IssueDetails = () => {
                 <button className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium">
                   Upvote Issue
                 </button>
-                <button className="w-full py-3 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-medium">
-                  Share Issue
-                </button>
-                <button className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium">
-                  Report Issue
-                </button>
-                <button className="w-full py-3 border-2 border-green-600 text-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium">
-                  Volunteer Help
-                </button>
               </div>
 
               {/* Stats */}
               <div className="mt-8 pt-8 border-t border-gray-100">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="text-center p-3 bg-blue-50 rounded-xl">
-                    <p className="text-2xl font-bold text-blue-600">245</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {issue.upvotes || 0}
+                    </p>
                     <p className="text-sm text-gray-600">Upvotes</p>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-xl">
-                    <p className="text-2xl font-bold text-green-600">12</p>
-                    <p className="text-sm text-gray-600">Volunteers</p>
                   </div>
                 </div>
               </div>

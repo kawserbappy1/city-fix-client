@@ -518,12 +518,22 @@ const TrackIssue = () => {
                     <td className="py-4 px-4">
                       <button
                         onClick={() => handleTrackIssue(issue)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                        disabled={issue.status === "rejected"}
+                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                          issue.status === "rejected" ||
+                          issue.workflow === "resolved"
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                        disabled={
+                          issue.status === "rejected" ||
+                          issue.workflow === "resolved"
+                        }
                       >
                         <FiEye className="w-4 h-4" />
                         {issue.status === "rejected"
                           ? "Rejected"
+                          : issue.workflow === "resolved"
+                          ? "Resolved"
                           : "Track Issue"}
                       </button>
                     </td>

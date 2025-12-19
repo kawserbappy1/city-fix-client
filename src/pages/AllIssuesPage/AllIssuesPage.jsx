@@ -7,13 +7,14 @@ import {
 import { FaUserTie } from "react-icons/fa";
 import { LuMapPin } from "react-icons/lu";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatRelativeTime } from "../../Utilities/formatDate";
 import { Link } from "react-router";
 import IssueCardSkeleton from "../../components/IssueCardSkeleton";
 
 const AllIssuesPage = () => {
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
@@ -21,6 +22,11 @@ const AllIssuesPage = () => {
       return res.data;
     },
   });
+
+  const handleUpvote = async (id) => {
+    await axiosSecure.patch(`/issues/upvote/${id}`);
+    queryClient.invalidateQueries(["issues"]);
+  };
 
   // Show skeleton loader while loading
   if (isLoading) {
@@ -257,7 +263,7 @@ const AllIssuesPage = () => {
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {issue.status}
+                        {issue.workflow}
                       </div>
                     </div>
 
@@ -288,7 +294,7 @@ const AllIssuesPage = () => {
                             {issue.district}
                           </div>
                           <div className="bg-blue-100 text-blue-700 rounded-full text-xs p-1">
-                            <span>400 vote</span>
+                            <span>{issue.upvotes || 0} votes</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between text-xs text-gray-500">
@@ -303,10 +309,13 @@ const AllIssuesPage = () => {
                       {/* Action Bar */}
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                         {/* Upvotes */}
-                        <button className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                        <button
+                          onClick={() => handleUpvote(issue._id)}
+                          className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                        >
                           <FiThumbsUp className="w-5 h-5 text-gray-600" />
                           <span className="font-medium text-gray-800">
-                            {issue.upvotes}
+                            {issue.upvotes || 0}
                           </span>
                           <span className="text-gray-600">Upvotes</span>
                         </button>

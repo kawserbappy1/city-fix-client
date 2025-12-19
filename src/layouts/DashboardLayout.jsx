@@ -25,6 +25,7 @@ import { LuTrainTrack } from "react-icons/lu";
 import { RiEditBoxLine, RiUserCommunityLine } from "react-icons/ri";
 import { GiPayMoney } from "react-icons/gi";
 import UseMembership from "../hooks/UseMembership";
+import { TbRocket } from "react-icons/tb";
 
 /* ================= ROLE BASED MENUS ================= */
 
@@ -77,6 +78,11 @@ const userMenu = [
     label: "Track Issue",
     icon: <LuTrainTrack />,
   },
+  {
+    path: "/dashboard/boost-issue",
+    label: "Boost Issue",
+    icon: <TbRocket />,
+  },
 ];
 
 const commonMenu = [
@@ -89,6 +95,7 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, logOut } = useAuth();
   const { role, isLoading } = useRole();
+  console.log(role);
 
   /* ===== Loading Role ===== */
   if (isLoading) {

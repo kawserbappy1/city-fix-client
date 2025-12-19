@@ -1,130 +1,136 @@
 import {
   FaMapMarkerAlt,
-  FaEye,
   FaComment,
   FaShareAlt,
-  FaFire,
-  FaUser,
-  FaCalendarAlt,
   FaExclamationTriangle,
+  FaUserTie,
 } from "react-icons/fa";
-import { BiUpvote } from "react-icons/bi";
-import { motion } from "framer-motion";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatRelativeTime } from "../../../Utilities/formatDate";
+import { LuMapPin } from "react-icons/lu";
+import { FiThumbsUp } from "react-icons/fi";
+import { Link } from "react-router";
 
 const IssueCard = () => {
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
+  const { data: issues = [], isLoading } = useQuery({
+    queryKey: ["issues"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/resolved-issue`);
+      return res.data;
+    },
+  });
+  const handleUpvote = async (id) => {
+    await axiosSecure.patch(`/issues/upvote/${id}`);
+    queryClient.invalidateQueries(["issues"]);
+  };
   return (
-    <motion.div
-      className={`card  border shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden rounded-xl`}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -3 }}
-      viewport={{ once: true }}
-    >
-      {/* Image Container */}
-      <figure className="relative h-40 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10"></div>
-        <img
-          src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-          alt="Broken Streetlight"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-
-        {/* Priority Badge */}
-        <div className="absolute top-3 left-3 z-20">
-          <div className={`badge badge-sm font-bold gap-1`}>
-            <FaExclamationTriangle className="text-xs" />
-          </div>
-        </div>
-      </figure>
-
-      {/* Content */}
-      <div className="card-body p-4 space-y-3">
-        {/* Title */}
-        <h2 className="card-title text-base font-bold text-base-content">
-          Broken Streetlight on Main Road
-        </h2>
-
-        {/* Description */}
-        <p className="text-base-content/70 text-xs leading-relaxed line-clamp-2">
-          Streetlight not working for past 3 days, causing safety concerns for
-          pedestrians.
-        </p>
-
-        {/* Location */}
-        <div className="flex items-center gap-2">
-          <FaMapMarkerAlt className="text-accent text-xs" />
-          <span className="text-xs text-base-content/80">
-            Central Avenue, Dhaka
-          </span>
-        </div>
-
-        {/* Stats */}
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
-                <BiUpvote className="text-primary text-xs" />
-              </div>
-              <span className="font-bold text-base-content">42</span>
+    <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {issues.map((issue) => (
+        <div
+          key={issue._id}
+          className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          {/* Issue Image */}
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={issue.issueImageURL}
+              alt={issue.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+            {/* Priority Badge */}
+            <div
+              className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white ${
+                issue.priority === "High"
+                  ? "bg-red-600"
+                  : issue.priority === "Medium"
+                  ? "bg-yellow-500"
+                  : "bg-green-600"
+              }`}
+            >
+              {issue.priority} Priority
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center">
-                <FaComment className="text-secondary text-xs" />
-              </div>
-              <span className="font-bold text-base-content">15</span>
+            {/* Status Badge */}
+            <div
+              className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
+                issue.status === "Resolved"
+                  ? "bg-green-100 text-green-800"
+                  : issue.status === "In Progress"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
+              {issue.workflow}
             </div>
           </div>
 
-          <div className="text-right">
-            <p className="text-xs text-base-content/60">Posted by</p>
-            <p className="font-medium text-base-content text-xs">Reza Ahmed</p>
+          {/* Issue Content */}
+          <div className="p-5">
+            {/* Category */}
+            <div className="mb-3">
+              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                {issue.category}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+              {issue.issueName}
+            </h3>
+
+            {/* Description */}
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {issue.description}
+            </p>
+
+            {/* Meta Info */}
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center justify-between text-sm text-gray-500 gap-2">
+                <div className="flex items-center gap-2">
+                  <LuMapPin />
+                  {issue.district}
+                </div>
+                <div className="bg-blue-100 text-blue-700 rounded-full text-xs p-1">
+                  <span>{issue.upvotes || 0} votes</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center gap-2">
+                  <FaUserTie />
+                  {issue.postedBy}
+                </div>
+                <div>{formatRelativeTime(issue.createdAt)}</div>
+              </div>
+            </div>
+
+            {/* Action Bar */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              {/* Upvotes */}
+              <button
+                onClick={() => handleUpvote(issue._id)}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <FiThumbsUp className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-800">
+                  {issue.upvotes || 0}
+                </span>
+                <span className="text-gray-600">Upvotes</span>
+              </button>
+
+              {/* View Details */}
+              <Link
+                to={`/issue-details/${issue._id}`}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                View Details
+              </Link>
+            </div>
           </div>
         </div>
-
-        {/* Progress Bar */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-base-content">Progress</span>
-            <span className={`text-xs font-bold `}>65%</span>
-          </div>
-          <div className="w-full bg-base-300 rounded-full h-1">
-            <motion.div
-              className={`bg-gradient-to-r  h-1 rounded-full`}
-              initial={{ width: 0 }}
-              whileInView={{ width: "65%" }}
-              transition={{ duration: 1 }}
-            ></motion.div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
-          <motion.button
-            className="btn btn-primary btn-xs flex-1 gap-1"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <BiUpvote />
-            Upvote
-          </motion.button>
-
-          <motion.button
-            className="btn btn-outline btn-accent btn-xs flex-1 gap-1"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FaShareAlt />
-            Share
-          </motion.button>
-        </div>
-
-        <div className="">
-          <button className="btn  bg-gradient-to-r from-blue-600 to-emerald-600 text-white w-full">
-            View More
-          </button>
-        </div>
-      </div>
-    </motion.div>
+      ))}
+    </div>
   );
 };
 
