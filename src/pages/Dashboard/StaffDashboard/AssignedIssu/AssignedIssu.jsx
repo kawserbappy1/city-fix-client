@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import useAuth from "../../../../hooks/useAuth";
 import Swal from "sweetalert2";
-import { FiAlertCircle } from "react-icons/fi";
+import { FiAlertCircle, FiZap } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const AssignedIssue = () => {
@@ -26,7 +26,6 @@ const AssignedIssue = () => {
   );
 
   const handleView = (issue) => {
-    console.log("Viewing issue:", issue);
     setSelectedIssue(issue);
     setIsModalOpen(true);
   };
@@ -177,6 +176,9 @@ const AssignedIssue = () => {
                 Issue Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Boost Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -196,6 +198,17 @@ const AssignedIssue = () => {
                   </div>
                   <div className="text-sm text-gray-500">
                     {issue.category || "No Category"}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex gap-1 items-center">
+                    {issue.boostStatus === "boost" ? (
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                        Boosted
+                      </span>
+                    ) : (
+                      "Not Boosted"
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

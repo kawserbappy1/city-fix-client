@@ -80,8 +80,6 @@ const EditIssue = () => {
     },
   });
 
-  console.log(issue);
-
   const updateIssueMutation = useMutation({
     mutationFn: (updateData) =>
       axiosSecure.patch(`/issue-edit/${id}`, updateData),

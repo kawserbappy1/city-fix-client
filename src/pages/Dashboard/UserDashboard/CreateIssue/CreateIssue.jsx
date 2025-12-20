@@ -27,10 +27,7 @@ const CreateIssue = () => {
   } = useForm();
   const isLimitReached =
     usage?.limit !== null && usage?.postCount >= usage?.limit;
-  console.log(isLimitReached, usage);
 
-  console.log(usage, isLimitReached);
-  // Watch the division and district fields
   const selectedDivision = useWatch({
     control,
     name: "division",
@@ -81,7 +78,6 @@ const CreateIssue = () => {
         `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOST}`,
         formData
       );
-      console.log("✅ Upload successful:", response.data);
       const issueImageURL = response.data.data.url;
       const issueInfo = { ...data, issueImageURL };
       Swal.fire({

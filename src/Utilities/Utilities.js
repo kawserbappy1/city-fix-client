@@ -8,6 +8,5 @@ export const imageUpload = async (imageData) => {
     `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_HOST}`,
     formData
   );
-  console.log(data?.data?.display_url);
   return data?.data?.display_url;
 };

@@ -1,6 +1,8 @@
-import React from "react";
+import useRole from "./../../../hooks/useRole";
 
 const Overview = () => {
+  const { role } = useRole();
+  console.log(role);
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -21,10 +23,6 @@ const Overview = () => {
           <p className="text-gray-500 text-sm">New Orders</p>
           <h3 className="text-3xl font-bold text-gray-800 mt-1">145</h3>
         </div>
-      </div>
-
-      <div className="bg-white p-8 rounded-xl shadow-sm h-64 flex items-center justify-center border border-gray-100">
-        <span className="text-gray-400">Chart Component Would Go Here</span>
       </div>
     </div>
   );

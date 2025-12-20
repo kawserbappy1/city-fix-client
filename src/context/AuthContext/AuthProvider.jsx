@@ -12,8 +12,8 @@ import {
 import { auth } from "../../firebase/firebase.init.js";
 const googleProvider = new GoogleAuthProvider();
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState();
-  const [loader, setLoader] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loader, setLoader] = useState(true);
 
   // Sign up new users
   const signUpNewUser = (email, password) => {

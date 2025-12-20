@@ -24,8 +24,8 @@ import { LuTrainTrack } from "react-icons/lu";
 
 import { RiEditBoxLine, RiUserCommunityLine } from "react-icons/ri";
 import { GiPayMoney } from "react-icons/gi";
-import UseMembership from "../hooks/UseMembership";
 import { TbRocket } from "react-icons/tb";
+import UseMembership from "../hooks/UseMembership";
 
 /* ================= ROLE BASED MENUS ================= */
 
@@ -40,7 +40,7 @@ const adminMenu = [
 
   { path: "/dashboard/all-users", label: "Manage Users", icon: <FiUsers /> },
   {
-    path: "/dashboard/payment",
+    path: "/dashboard/manage-payment",
     label: "Manage Payment",
     icon: <PiMoney />,
   },
@@ -93,12 +93,11 @@ const commonMenu = [
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, logOut } = useAuth();
-  const { role, isLoading } = useRole();
-  console.log(role);
-
+  const { user, logOut, loader } = useAuth();
+  const { role, isRoleLoading } = useRole();
+  const { membership } = UseMembership();
   /* ===== Loading Role ===== */
-  if (isLoading) {
+  if (isRoleLoading || loader) {
     return (
       <div className="h-screen flex items-center justify-center">
         <span className="loading loading-spinner loading-lg"></span>
@@ -132,7 +131,7 @@ const DashboardLayout = () => {
         lg:translate-x-0 lg:static`}
       >
         {/* Logo */}
-        <div className="flex items-center justify-center h-20 border-b">
+        <div className="flex items-center justify-center h-18 border-b border-b-gray-300">
           <Link to="/" className="text-2xl font-bold text-blue-600">
             CityFix
           </Link>
@@ -189,7 +188,7 @@ const DashboardLayout = () => {
             </Link>
             <button
               onClick={logOut}
-              className="flex items-center gap-2 text-red-500 text-sm mt-2"
+              className="flex items-center gap-2 text-red-500 text-sm mt-2 cursor-pointer"
             >
               <FiLogOut /> Logout
             </button>
@@ -211,6 +210,14 @@ const DashboardLayout = () => {
               className="bg-transparent outline-none ml-2"
               placeholder="Search..."
             />
+          </div>
+          <div>
+            {role === "user" && membership === "free" ? (
+              <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-full hover:from-purple-600 hover:to-pink-600 transition-all cursor-pointer shadow hover:shadow-md">
+                <FiZap className="w-3 h-3" />
+                <span>Upgrade Pro</span>
+              </div>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-4">

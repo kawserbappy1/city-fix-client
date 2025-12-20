@@ -100,7 +100,6 @@ const BeStaff = () => {
   });
 
   const handlestaffregistration = (data) => {
-    console.log(data);
     const staffData = {
       name: data.name,
       email: data.email,

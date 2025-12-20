@@ -20,7 +20,6 @@ const AllStaff = () => {
   });
 
   const handleView = (staff) => {
-    console.log("Opening modal for:", staff?.name);
     setSelectedStaff(staff);
     setIsModalOpen(true);
   };

@@ -66,7 +66,6 @@ const StaffProfile = () => {
   });
   // Handle form submission
   const handleupdateStaff = (data) => {
-    console.log("Form data:", data);
     if (!staff?._id) {
       Swal.fire("Error", "Staff ID not found", "error");
       return;

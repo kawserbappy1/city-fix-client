@@ -29,8 +29,6 @@ const IssueDetails = () => {
     enabled: !!id,
   });
 
-  console.log(issue);
-
   // Get priority badge color
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {

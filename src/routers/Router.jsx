@@ -28,6 +28,9 @@ import AssignedIssue from "../pages/Dashboard/StaffDashboard/AssignedIssu/Assign
 import TrackIssue from "../pages/Dashboard/UserDashboard/TrackIssue/TrackIssue";
 import AdminRoute from "./AdminRoute";
 import BoostIssue from "../pages/Dashboard/UserDashboard/BoostIssue/BoostIssue";
+import PaymentSuccess from "../pages/Dashboard/UserDashboard/Payment/PaymentSuccess";
+import PaymentCencel from "../pages/Dashboard/UserDashboard/Payment/PaymentCencel";
+import Managepayment from "../pages/Dashboard/Admin/Managepayment/Managepayment";
 
 const router = createBrowserRouter([
   {
@@ -44,11 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: "blog",
-        element: (
-          <PrivateRoute>
-            <Blog></Blog>,
-          </PrivateRoute>
-        ),
+        element: <Blog></Blog>,
       },
       {
         path: "issue-details/:id",
@@ -100,6 +99,14 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "payment-success",
+    element: <PaymentSuccess></PaymentSuccess>,
+  },
+  {
+    path: "payment-cancelled",
+    element: <PaymentCencel></PaymentCencel>,
+  },
+  {
     path: "dashboard",
     element: (
       <PrivateRoute>
@@ -109,7 +116,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Overview></Overview>,
+        element: (
+          <PrivateRoute>
+            <Overview></Overview>
+          </PrivateRoute>
+        ),
       },
 
       {
@@ -122,16 +133,28 @@ const router = createBrowserRouter([
       },
       {
         path: "my-issues",
-        element: <MyIssues></MyIssues>,
+        element: (
+          <PrivateRoute>
+            <MyIssues></MyIssues>
+          </PrivateRoute>
+        ),
       },
       {
         path: "create-issue",
-        element: <CreateIssue></CreateIssue>,
+        element: (
+          <PrivateRoute>
+            <CreateIssue></CreateIssue>
+          </PrivateRoute>
+        ),
         loader: () => fetch("/area.json").then((res) => res.json()),
       },
       {
         path: "view-edit",
-        element: <EditProfile></EditProfile>,
+        element: (
+          <PrivateRoute>
+            <EditProfile></EditProfile>
+          </PrivateRoute>
+        ),
       },
       {
         path: "all-users",
@@ -151,33 +174,61 @@ const router = createBrowserRouter([
       },
       {
         path: "edit-issue/:id",
-        element: <EditIssue></EditIssue>,
+        element: (
+          <PrivateRoute>
+            <EditIssue></EditIssue>
+          </PrivateRoute>
+        ),
         loader: () => fetch("/area.json").then((res) => res.json()),
       },
       {
         path: "staff-profile",
-        element: <StaffProfile></StaffProfile>,
+        element: (
+          <PrivateRoute>
+            <StaffProfile></StaffProfile>
+          </PrivateRoute>
+        ),
       },
       {
         path: "assign-issue",
         element: (
-          <AdminRoute>
+          <PrivateRoute>
             <AssignedIssue></AssignedIssue>
-          </AdminRoute>
+          </PrivateRoute>
         ),
       },
       {
         path: "be-staff",
-        element: <BeStaff></BeStaff>,
+        element: (
+          <PrivateRoute>
+            <BeStaff></BeStaff>
+          </PrivateRoute>
+        ),
         loader: () => fetch(`/area.json`).then((res) => res.json()),
       },
       {
         path: "track-issue",
-        element: <TrackIssue></TrackIssue>,
+        element: (
+          <PrivateRoute>
+            <TrackIssue></TrackIssue>
+          </PrivateRoute>
+        ),
       },
       {
         path: "boost-issue",
-        element: <BoostIssue></BoostIssue>,
+        element: (
+          <PrivateRoute>
+            <BoostIssue></BoostIssue>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "manage-payment",
+        element: (
+          <AdminRoute>
+            <Managepayment></Managepayment>
+          </AdminRoute>
+        ),
       },
     ],
   },
