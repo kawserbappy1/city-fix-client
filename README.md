@@ -1,12 +1,11 @@
-# 🏗️ Public Infrastructure Issue Reporting System
+# 🏗️ Public Issue Reporting System
 
 A comprehensive digital platform that enables citizens to report public infrastructure issues and allows government authorities to efficiently manage, track, and resolve them.
 
 ---
 
 ## 🌐 Live Demo
-**Live Site:** https://your-live-site-url.com  
-_(Replace with your deployed site URL)_
+**Live Site:** https://city-fix-bappy.netlify.app/
 
 ---
 
@@ -18,11 +17,11 @@ _(Replace with your deployed site URL)_
 
 ### 🧑‍💼 Staff Access
 - **Email:** staff@mail.com  
-- **Password:** staff123A@
+- **Password:** 123456aA@
 
 ### 🧑 Citizen Access
-- **Email:** citizen@mail.com  
-- **Password:** citizen123A@
+- **Email:** fari1@mail.com 
+- **Password:** 123456aA@
 
 ---
 
